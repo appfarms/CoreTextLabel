@@ -1,7 +1,7 @@
 CoreTextLabel
 =============
 
-Simple Label replacement to display NSAttributedString in iOS applications
+Simple UILabel replacement to display NSAttributedString in iOS applications
 
 ## Requirements
 
