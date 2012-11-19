@@ -38,13 +38,21 @@
     CGFloat width   = self.view.frame.size.width;
     CGRect frame    = CGRectMake(padding, padding, width-padding*2.f, 800);
 
+    UIFont * regularFont    = [UIFont fontWithName:@"Verdana" size:24.f];
+    UIFont * boldFont       = [UIFont fontWithName:@"Verdana-Bold" size:24.f];
+    UIFont * italicFont     = [UIFont fontWithName:@"Verdana-Italic" size:24.f];
+    UIFont * boldItalicFont = [UIFont fontWithName:@"Verdana-BoldItalic" size:24.f];
+
     NSString * htmlPath   = [[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"];
     NSString * htmlString = [NSString stringWithContentsOfFile:htmlPath
                                                       encoding:NSUTF8StringEncoding
                                                          error:nil];
 
     CoreTextLabel * label  = [[CoreTextLabel alloc] initWithFrame:frame];
-    label.defaultFontSize  = 20.f;
+    label.regularFont      = regularFont;
+    label.boldFont         = boldFont;
+    label.italicFont       = italicFont;
+    label.boldItalicFont   = boldItalicFont;
     label.attributedString = [label attributedStringByHTML:htmlString];
     [label sizeToFit];
     [self.view addSubview:label];
