@@ -6,20 +6,40 @@ Simple UILabel replacement to display NSAttributedString in iOS applications.
 ## Example
 
 ``` objective-c
-    CGFloat padding = 10.f;
-    CGFloat width   = self.view.frame.size.width;
-    CGRect frame    = CGRectMake(padding, padding, width-padding*2.f, 800);
-
-    NSString * htmlPath   = [[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"];
-    NSString * htmlString = [NSString stringWithContentsOfFile:htmlPath
-                                                      encoding:NSUTF8StringEncoding
-                                                         error:nil];
-
     CoreTextLabel * label  = [[CoreTextLabel alloc] initWithFrame:frame];
     label.defaultFontSize  = 20.f;
     label.attributedString = [label attributedStringByHTML:htmlString];
     [label sizeToFit];
     [self.view addSubview:label];
+```
+
+<img src="https://raw.github.com/dkuhnke/CoreTextLabel/master/Sample/Screenshot-1.png" style="display:block; margin: 10px;" />
+
+## Install
+
+### Adding it to your project
+
+Add CoreTextLabel pod to your [Podfile](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile).
+
+```
+$ edit Podfile
+```
+
+```ruby
+platform :ios
+pod 'CoreTextLabel', :head
+```
+
+And then you [install the dependencies](https://github.com/CocoaPods/CocoaPods/wiki/Creating-a-project-that-uses-CocoaPods) in your project.
+
+```
+$ pod install
+```
+
+Remember to always open the Xcode workspace instead of the project file when you're building.
+
+```
+$ open App.xcworkspace
 ```
 
 ## Requirements
