@@ -26,10 +26,10 @@ Simple UILabel replacement to display NSAttributedString in iOS applications
 
 CoreTextLabel 1.0 and higher requires iOS 3.2 and above.
 
-### Frameworks used:
+### Framework dependencies
 
-<QuartzCore/QuartzCore.h>
-<CoreText/CoreText.h>
+- QuartzCore
+- CoreText
 
 ### ARC
 
