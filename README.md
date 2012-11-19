@@ -17,12 +17,10 @@ Simple UILabel replacement to display NSAttributedString in iOS applications.
 
 ## Install
 
-### Adding it to your project
-
 Add CoreTextLabel pod to your [Podfile](https://github.com/CocoaPods/CocoaPods/wiki/A-Podfile).
 
 ```
-$ edit Podfile
+$ vim Podfile
 ```
 
 ```ruby
