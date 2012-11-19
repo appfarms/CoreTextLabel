@@ -1,0 +1,367 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		717E1CCD11744ED69CB066D1 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FDAEB2849E041CBB95575D8 /* libPods.a */; };
+		BA57F9DB165AAD7300B4E6EF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA57F9DA165AAD7300B4E6EF /* UIKit.framework */; };
+		BA57F9DD165AAD7300B4E6EF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA57F9DC165AAD7300B4E6EF /* Foundation.framework */; };
+		BA57F9DF165AAD7300B4E6EF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA57F9DE165AAD7300B4E6EF /* CoreGraphics.framework */; };
+		BA57F9E5165AAD7300B4E6EF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9E3165AAD7300B4E6EF /* InfoPlist.strings */; };
+		BA57F9E7165AAD7300B4E6EF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BA57F9E6165AAD7300B4E6EF /* main.m */; };
+		BA57F9EB165AAD7300B4E6EF /* AFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BA57F9EA165AAD7300B4E6EF /* AFAppDelegate.m */; };
+		BA57F9ED165AAD7300B4E6EF /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9EC165AAD7300B4E6EF /* Default.png */; };
+		BA57F9EF165AAD7300B4E6EF /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9EE165AAD7300B4E6EF /* Default@2x.png */; };
+		BA57F9F1165AAD7300B4E6EF /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9F0165AAD7300B4E6EF /* Default-568h@2x.png */; };
+		BA57F9F4165AAD7300B4E6EF /* AFViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BA57F9F3165AAD7300B4E6EF /* AFViewController.m */; };
+		BA57F9F7165AAD7300B4E6EF /* AFViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9F5165AAD7300B4E6EF /* AFViewController_iPhone.xib */; };
+		BA57F9FA165AAD7300B4E6EF /* AFViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = BA57F9F8165AAD7300B4E6EF /* AFViewController_iPad.xib */; };
+		BA57FA09165AAE4F00B4E6EF /* CoreTextLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = BA57FA08165AAE4F00B4E6EF /* CoreTextLabel.m */; };
+		BA57FA0C165AB85D00B4E6EF /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA57FA0B165AB85D00B4E6EF /* CoreText.framework */; };
+		BA57FA0E165AB86500B4E6EF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA57FA0D165AB86500B4E6EF /* QuartzCore.framework */; };
+		BA57FA10165ABA1A00B4E6EF /* Sample.html in Resources */ = {isa = PBXBuildFile; fileRef = BA57FA0F165ABA1A00B4E6EF /* Sample.html */; };
+		BA57FA19165ABF1900B4E6EF /* AppIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BA57FA18165ABF1900B4E6EF /* AppIcon@2x.png */; };
+		BA57FA1C165ABF4A00B4E6EF /* AppIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = BA57FA1B165ABF4A00B4E6EF /* AppIcon.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		9FDAEB2849E041CBB95575D8 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA57F9D6165AAD7300B4E6EF /* CoreTextLabelSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoreTextLabelSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA57F9DA165AAD7300B4E6EF /* UIKit.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		BA57F9DC165AAD7300B4E6EF /* Foundation.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		BA57F9DE165AAD7300B4E6EF /* CoreGraphics.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		BA57F9E2165AAD7300B4E6EF /* CoreTextLabelSample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreTextLabelSample-Info.plist"; sourceTree = "<group>"; };
+		BA57F9E4165AAD7300B4E6EF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		BA57F9E6165AAD7300B4E6EF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		BA57F9E8165AAD7300B4E6EF /* CoreTextLabelSample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CoreTextLabelSample-Prefix.pch"; sourceTree = "<group>"; };
+		BA57F9E9165AAD7300B4E6EF /* AFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AFAppDelegate.h; sourceTree = "<group>"; };
+		BA57F9EA165AAD7300B4E6EF /* AFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AFAppDelegate.m; sourceTree = "<group>"; };
+		BA57F9EC165AAD7300B4E6EF /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		BA57F9EE165AAD7300B4E6EF /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		BA57F9F0165AAD7300B4E6EF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		BA57F9F2165AAD7300B4E6EF /* AFViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AFViewController.h; sourceTree = "<group>"; };
+		BA57F9F3165AAD7300B4E6EF /* AFViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AFViewController.m; sourceTree = "<group>"; };
+		BA57F9F6165AAD7300B4E6EF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AFViewController_iPhone.xib; sourceTree = "<group>"; };
+		BA57F9F9165AAD7300B4E6EF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/AFViewController_iPad.xib; sourceTree = "<group>"; };
+		BA57FA07165AAE4F00B4E6EF /* CoreTextLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreTextLabel.h; path = ../../../CoreTextLabel.h; sourceTree = "<group>"; };
+		BA57FA08165AAE4F00B4E6EF /* CoreTextLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CoreTextLabel.m; path = ../../../CoreTextLabel.m; sourceTree = "<group>"; };
+		BA57FA0B165AB85D00B4E6EF /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		BA57FA0D165AB86500B4E6EF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		BA57FA0F165ABA1A00B4E6EF /* Sample.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Sample.html; sourceTree = "<group>"; };
+		BA57FA18165ABF1900B4E6EF /* AppIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "AppIcon@2x.png"; path = "../AppIcon@2x.png"; sourceTree = "<group>"; };
+		BA57FA1B165ABF4A00B4E6EF /* AppIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = AppIcon.png; path = ../AppIcon.png; sourceTree = "<group>"; };
+		EDF4AD1457CC4FA3B7A88D36 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BA57F9D3165AAD7300B4E6EF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA57FA0E165AB86500B4E6EF /* QuartzCore.framework in Frameworks */,
+				BA57FA0C165AB85D00B4E6EF /* CoreText.framework in Frameworks */,
+				BA57F9DB165AAD7300B4E6EF /* UIKit.framework in Frameworks */,
+				BA57F9DD165AAD7300B4E6EF /* Foundation.framework in Frameworks */,
+				BA57F9DF165AAD7300B4E6EF /* CoreGraphics.framework in Frameworks */,
+				717E1CCD11744ED69CB066D1 /* libPods.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BA57F9CB165AAD7300B4E6EF = {
+			isa = PBXGroup;
+			children = (
+				BA57F9E0165AAD7300B4E6EF /* CoreTextLabelSample */,
+				BA57F9D9165AAD7300B4E6EF /* Frameworks */,
+				BA57F9D7165AAD7300B4E6EF /* Products */,
+				EDF4AD1457CC4FA3B7A88D36 /* Pods.xcconfig */,
+			);
+			sourceTree = "<group>";
+		};
+		BA57F9D7165AAD7300B4E6EF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BA57F9D6165AAD7300B4E6EF /* CoreTextLabelSample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BA57F9D9165AAD7300B4E6EF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BA57FA0D165AB86500B4E6EF /* QuartzCore.framework */,
+				BA57FA0B165AB85D00B4E6EF /* CoreText.framework */,
+				BA57F9DA165AAD7300B4E6EF /* UIKit.framework */,
+				BA57F9DC165AAD7300B4E6EF /* Foundation.framework */,
+				BA57F9DE165AAD7300B4E6EF /* CoreGraphics.framework */,
+				9FDAEB2849E041CBB95575D8 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BA57F9E0165AAD7300B4E6EF /* CoreTextLabelSample */ = {
+			isa = PBXGroup;
+			children = (
+				BA57FA07165AAE4F00B4E6EF /* CoreTextLabel.h */,
+				BA57FA08165AAE4F00B4E6EF /* CoreTextLabel.m */,
+				BA57F9F2165AAD7300B4E6EF /* AFViewController.h */,
+				BA57F9F3165AAD7300B4E6EF /* AFViewController.m */,
+				BA57F9E1165AAD7300B4E6EF /* Supporting Files */,
+			);
+			path = CoreTextLabelSample;
+			sourceTree = "<group>";
+		};
+		BA57F9E1165AAD7300B4E6EF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BA57FA1B165ABF4A00B4E6EF /* AppIcon.png */,
+				BA57FA18165ABF1900B4E6EF /* AppIcon@2x.png */,
+				BA57FA0F165ABA1A00B4E6EF /* Sample.html */,
+				BA57F9E9165AAD7300B4E6EF /* AFAppDelegate.h */,
+				BA57F9EA165AAD7300B4E6EF /* AFAppDelegate.m */,
+				BA57F9F5165AAD7300B4E6EF /* AFViewController_iPhone.xib */,
+				BA57F9F8165AAD7300B4E6EF /* AFViewController_iPad.xib */,
+				BA57F9E2165AAD7300B4E6EF /* CoreTextLabelSample-Info.plist */,
+				BA57F9E3165AAD7300B4E6EF /* InfoPlist.strings */,
+				BA57F9E6165AAD7300B4E6EF /* main.m */,
+				BA57F9E8165AAD7300B4E6EF /* CoreTextLabelSample-Prefix.pch */,
+				BA57F9EC165AAD7300B4E6EF /* Default.png */,
+				BA57F9EE165AAD7300B4E6EF /* Default@2x.png */,
+				BA57F9F0165AAD7300B4E6EF /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BA57F9D5165AAD7300B4E6EF /* CoreTextLabelSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA57F9FD165AAD7300B4E6EF /* Build configuration list for PBXNativeTarget "CoreTextLabelSample" */;
+			buildPhases = (
+				BA57F9D2165AAD7300B4E6EF /* Sources */,
+				BA57F9D3165AAD7300B4E6EF /* Frameworks */,
+				BA57F9D4165AAD7300B4E6EF /* Resources */,
+				2C1D4C1E4FA64A279DB235F4 /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CoreTextLabelSample;
+			productName = CoreTextLabelSample;
+			productReference = BA57F9D6165AAD7300B4E6EF /* CoreTextLabelSample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BA57F9CD165AAD7300B4E6EF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = AF;
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "appfarms GmbH & Co. KG";
+			};
+			buildConfigurationList = BA57F9D0165AAD7300B4E6EF /* Build configuration list for PBXProject "CoreTextLabelSample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BA57F9CB165AAD7300B4E6EF;
+			productRefGroup = BA57F9D7165AAD7300B4E6EF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BA57F9D5165AAD7300B4E6EF /* CoreTextLabelSample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BA57F9D4165AAD7300B4E6EF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA57F9E5165AAD7300B4E6EF /* InfoPlist.strings in Resources */,
+				BA57F9ED165AAD7300B4E6EF /* Default.png in Resources */,
+				BA57F9EF165AAD7300B4E6EF /* Default@2x.png in Resources */,
+				BA57F9F1165AAD7300B4E6EF /* Default-568h@2x.png in Resources */,
+				BA57F9F7165AAD7300B4E6EF /* AFViewController_iPhone.xib in Resources */,
+				BA57F9FA165AAD7300B4E6EF /* AFViewController_iPad.xib in Resources */,
+				BA57FA10165ABA1A00B4E6EF /* Sample.html in Resources */,
+				BA57FA19165ABF1900B4E6EF /* AppIcon@2x.png in Resources */,
+				BA57FA1C165ABF4A00B4E6EF /* AppIcon.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2C1D4C1E4FA64A279DB235F4 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BA57F9D2165AAD7300B4E6EF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA57F9E7165AAD7300B4E6EF /* main.m in Sources */,
+				BA57F9EB165AAD7300B4E6EF /* AFAppDelegate.m in Sources */,
+				BA57F9F4165AAD7300B4E6EF /* AFViewController.m in Sources */,
+				BA57FA09165AAE4F00B4E6EF /* CoreTextLabel.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		BA57F9E3165AAD7300B4E6EF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BA57F9E4165AAD7300B4E6EF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		BA57F9F5165AAD7300B4E6EF /* AFViewController_iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BA57F9F6165AAD7300B4E6EF /* en */,
+			);
+			name = AFViewController_iPhone.xib;
+			sourceTree = "<group>";
+		};
+		BA57F9F8165AAD7300B4E6EF /* AFViewController_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BA57F9F9165AAD7300B4E6EF /* en */,
+			);
+			name = AFViewController_iPad.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BA57F9FB165AAD7300B4E6EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BA57F9FC165AAD7300B4E6EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BA57F9FE165AAD7300B4E6EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EDF4AD1457CC4FA3B7A88D36 /* Pods.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CoreTextLabelSample/CoreTextLabelSample-Prefix.pch";
+				INFOPLIST_FILE = "CoreTextLabelSample/CoreTextLabelSample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		BA57F9FF165AAD7300B4E6EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EDF4AD1457CC4FA3B7A88D36 /* Pods.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CoreTextLabelSample/CoreTextLabelSample-Prefix.pch";
+				INFOPLIST_FILE = "CoreTextLabelSample/CoreTextLabelSample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BA57F9D0165AAD7300B4E6EF /* Build configuration list for PBXProject "CoreTextLabelSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA57F9FB165AAD7300B4E6EF /* Debug */,
+				BA57F9FC165AAD7300B4E6EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA57F9FD165AAD7300B4E6EF /* Build configuration list for PBXNativeTarget "CoreTextLabelSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA57F9FE165AAD7300B4E6EF /* Debug */,
+				BA57F9FF165AAD7300B4E6EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BA57F9CD165AAD7300B4E6EF /* Project object */;
+}

@@ -25,18 +25,24 @@
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
 
-@interface CoreTextLabel : UIView 
+@interface CoreTextLabel : UIView
 
-@property (nonatomic, retain) UIFont  * regularFont;
-@property (nonatomic, retain) UIFont  * boldFont;
-@property (nonatomic, retain) UIFont  * italicFont;
-@property (nonatomic, retain) UIFont  * boldItalicFont;
-@property (nonatomic, retain) UIColor * textColor;
+@property (nonatomic, retain) UIFont                    * regularFont;      /**< Default: [UIFont systemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * boldFont;         /**< Default: [UIFont boldSystemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * italicFont;       /**< Default: [UIFont italicSystemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * boldItalicFont;   /**< Default: [UIFont italicSystemFontOfSize:] */
+@property (nonatomic, retain) UIColor                   * textColor;        /**< Default: [UIColor blackColor] */
+@property (nonatomic, retain) NSMutableAttributedString * attributedString; /**< Default: nil */
+@property (nonatomic, assign) CGFloat                     defaultFontSize;  /**< Default font size used if no fonts defined from outside => 18.f */
 
-@property (nonatomic, retain) NSMutableAttributedString * attributedString;
-
+/**
+ * Create NSMutableAttributedString by HTML string
+ *
+ * - </p> and <br /> will be replaced by NEWLINE
+ * - <b> and <strong> will be styled with self.boldFont and self.textColor
+ * - <i> and <em> will be styled with self.italicFont and self.textColor
+ * - <i>/<em> combined with <b>/<strong> will be styled with self.boldItalicFont and self.textColor
+ */
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html;
-
-+ (CGFloat) defaultFontSize;
 
 @end

@@ -3,11 +3,33 @@ CoreTextLabel
 
 Simple UILabel replacement to display NSAttributedString in iOS applications
 
+## Example
+
+``` objective-c
+    CGFloat padding = 10.f;
+    CGFloat width   = self.view.frame.size.width;
+    CGRect frame    = CGRectMake(padding, padding, width-padding*2.f, 800);
+
+    NSString * htmlPath   = [[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"];
+    NSString * htmlString = [NSString stringWithContentsOfFile:htmlPath
+                                                      encoding:NSUTF8StringEncoding
+                                                         error:nil];
+
+    CoreTextLabel * label  = [[CoreTextLabel alloc] initWithFrame:frame];
+    label.defaultFontSize  = 20.f;
+    label.attributedString = [label attributedStringByHTML:htmlString];
+    [label sizeToFit];
+    [self.view addSubview:label];
+```
+
 ## Requirements
 
 CoreTextLabel 1.0 and higher requires iOS 3.2 and above.
 
-For compatibility with iOS 4.3, use the latest 0.10.x release.
+### Frameworks used:
+
+<QuartzCore/QuartzCore.h>
+<CoreText/CoreText.h>
 
 ### ARC
 
