@@ -13,7 +13,10 @@ Simple UILabel replacement to display NSAttributedString by HTML in iOS applicat
     [self.view addSubview:label];
 ```
 
-<img src="https://raw.github.com/dkuhnke/CoreTextLabel/master/Sample/Screenshot-1.png" style="display:block; margin: 10px;" />
+<br style="display: block;" />
+<img src="https://raw.github.com/dkuhnke/CoreTextLabel/master/Sample/Screenshot-1.png" style="float: left; margin: 10px;" />
+<img src="https://raw.github.com/dkuhnke/CoreTextLabel/master/Sample/Screenshot-2.png" style="float: left; margin: 10px;" />
+<br style="display: block;" />
 
 ## Install
 
