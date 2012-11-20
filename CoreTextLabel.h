@@ -27,21 +27,25 @@
 
 @interface CoreTextLabel : UIView
 
-@property (nonatomic, retain) UIFont                    * regularFont;      /**< Default: [UIFont systemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * boldFont;         /**< Default: [UIFont boldSystemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * italicFont;       /**< Default: [UIFont italicSystemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * boldItalicFont;   /**< Default: [UIFont italicSystemFontOfSize:] */
-@property (nonatomic, retain) UIColor                   * textColor;        /**< Default: [UIColor blackColor] */
-@property (nonatomic, retain) NSMutableAttributedString * attributedString; /**< Default: nil */
-@property (nonatomic, assign) CGFloat                     defaultFontSize;  /**< Default font size used if no fonts defined from outside => 18.f */
+@property (nonatomic, retain) UIFont                    * font;                /**< Default: [UIFont systemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * boldFont;            /**< Default: [UIFont boldSystemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * italicFont;          /**< Default: [UIFont italicSystemFontOfSize:] */
+@property (nonatomic, retain) UIFont                    * boldItalicFont;      /**< Default: [UIFont italicSystemFontOfSize:] */
+@property (nonatomic, retain) UIColor                   * textColor;           /**< Default: [UIColor blackColor] */
+@property (nonatomic, retain) UIColor                   * boldTextColor;       /**< Default: self.textColor */
+@property (nonatomic, retain) UIColor                   * italicTextColor;     /**< Default: self.textColor */
+@property (nonatomic, retain) UIColor                   * boldItalicTextColor; /**< Default: self.textColor */
+@property (nonatomic, retain) NSMutableAttributedString * attributedString;    /**< Default: nil */
+@property (nonatomic, assign) CGFloat                     defaultFontSize;     /**< Default font size used if no fonts defined from outside => 18.f */
 
 /**
  * Create NSMutableAttributedString by HTML string
  *
+ * - text will be styled with self.font and self.textColor
  * - </p> and <br /> will be replaced by NEWLINE
- * - <b> and <strong> will be styled with self.boldFont and self.textColor
- * - <i> and <em> will be styled with self.italicFont and self.textColor
- * - <i>/<em> combined with <b>/<strong> will be styled with self.boldItalicFont and self.textColor
+ * - <b> and <strong> will be styled with self.boldFont and self.boldTextColor
+ * - <i> and <em> will be styled with self.italicFont and self.italicTextColor
+ * - <i>/<em> combined with <b>/<strong> will be styled with self.boldItalicFont and self.boldItalicTextColor
  */
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html;
 

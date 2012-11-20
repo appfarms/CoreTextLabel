@@ -37,11 +37,14 @@
 
 @implementation CoreTextLabel
 
-@synthesize regularFont         = _regularFont;
+@synthesize font                = _font;
 @synthesize boldFont            = _boldFont;
 @synthesize italicFont          = _italicFont;
 @synthesize boldItalicFont      = _boldItalicFont;
 @synthesize textColor           = _textColor;
+@synthesize boldTextColor       = _boldTextColor;
+@synthesize italicTextColor     = _italicTextColor;
+@synthesize boldItalicTextColor = _boldItalicTextColor;
 @synthesize attributedTextLayer = _attributedTextLayer;
 @synthesize attributedString    = _attributedString;
 @synthesize defaultFontSize     = _defaultFontSize;
@@ -52,20 +55,20 @@
 	{
 		return nil;
 	}
-
+    
 	self = [super initWithFrame:frame];
-
+    
 	if (self)
 	{
 		self.backgroundColor = [UIColor clearColor];
-
+        
         _defaultFontSize                   = 18.f;
 		_attributedTextLayer               = [CATextLayer new];
 		_attributedTextLayer.frame         = self.bounds;
 		_attributedTextLayer.contentsScale = [[UIScreen mainScreen] scale];
-
+        
 		[self.layer addSublayer:_attributedTextLayer];
-
+        
         self.layer.actions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                               [NSNull null], @"onOrderIn",
                               [NSNull null], @"onOrderOut",
@@ -74,23 +77,23 @@
                               [NSNull null], @"bounds",
                               [NSNull null], @"position",
                               nil];
-
+        
         _attributedTextLayer.actions = self.layer.actions;
 	}
-
+    
 	return self;
 }
 
 #pragma mark - Getter
 
-- (UIFont *) regularFont
+- (UIFont *) font
 {
-    if (!_regularFont)
+    if (!_font)
     {
-        self.regularFont = [UIFont systemFontOfSize:self.defaultFontSize];
+        self.font = [UIFont systemFontOfSize:self.defaultFontSize];
     }
-
-    return _regularFont;
+    
+    return _font;
 }
 
 - (UIFont *) boldFont
@@ -99,7 +102,7 @@
     {
         self.boldFont = [UIFont boldSystemFontOfSize:self.defaultFontSize];
     }
-
+    
     return _boldFont;
 }
 
@@ -109,7 +112,7 @@
     {
         self.italicFont = [UIFont italicSystemFontOfSize:self.defaultFontSize];
     }
-
+    
     return _italicFont;
 }
 
@@ -119,7 +122,7 @@
     {
         self.boldItalicFont = [UIFont italicSystemFontOfSize:self.defaultFontSize];
     }
-
+    
     return _boldItalicFont;
 }
 
@@ -129,8 +132,39 @@
     {
         self.textColor = [UIColor blackColor];
     }
-
+    
     return _textColor;
+}
+
+- (UIColor *) boldTextColor
+{
+    if (!_boldTextColor)
+    {
+        self.boldTextColor = self.textColor;
+    }
+    
+    return _boldTextColor;
+}
+
+- (UIColor *) italicTextColor
+{
+    if (!_italicTextColor)
+    {
+        self.italicTextColor = self.textColor;
+    }
+    
+    return _italicTextColor;
+}
+
+
+- (UIColor *) boldItalicTextColor
+{
+    if (!_boldItalicTextColor)
+    {
+        self.boldItalicTextColor = self.textColor;
+    }
+    
+    return _boldItalicTextColor;
 }
 
 #pragma mark - Setter
@@ -152,18 +186,16 @@
                                                                                   NULL,
                                                                                   referenceSize,
                                                                                   range);
-
-    //HACK: There is a bug in Core Text where suggested size is not quite right
-    //I'm padding it with half line height to make up for the bug.
-    //see the coretext-dev list: http://web.archiveorange.com/archive/v/nagQXwVJ6Gzix0veMh09
-
+    
+    // HACK: There is a bug in Core Text where suggested size is not quite right
+    // I'm padding it with half line height to make up for the bug.
+    // see the coretext-dev list: http://web.archiveorange.com/archive/v/nagQXwVJ6Gzix0veMh09
     CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)attrString);
     CGFloat ascent, descent, leading;
     CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
     CGFloat lineHeight = ascent + descent + leading;
     suggestedSize.height += lineHeight / 2.f;
-    //END HACK
-
+    
     return suggestedSize;
 }
 
@@ -181,9 +213,9 @@
     CGSize  recommendedSize = [self suggestSizeAndFitRange:&fitRange
                                        forAttributedString:_attributedString
                                                  usingSize:textDisplayRect.size];
-
+    
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, recommendedSize.height);
-
+    
     _attributedTextLayer.frame   = self.bounds;
     _attributedTextLayer.wrapped = YES;
 }
@@ -197,44 +229,47 @@
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag
 {
+	UIFont  * parentFont  = self.font;
+    UIColor * parentColor = self.textColor;
+    
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        self.regularFont,       (id)NSFontAttributeName,
-                                        self.textColor.CGColor, (id)kCTForegroundColorAttributeName,
+                                        parentFont,          (id)NSFontAttributeName,
+                                        parentColor.CGColor, (id)kCTForegroundColorAttributeName,
                                         nil];
-
+    
 	if (!html)
 	{
 		return [[NSMutableAttributedString alloc] initWithString:@""
                                                       attributes:attributes];
 	}
-
+    
 	NSString * newLinePlaceHolder = @"{BR}";
-
+    
 	// Fix newlines
 	html = [html stringByReplacingOccurrencesOfString:@"\n" withString:@""];
 	html = [html stringByReplacingOccurrencesOfRegex:@"<p[^>]*>" withString:@""];
 	html = [html stringByReplacingOccurrencesOfString:@"</p>" withString:newLinePlaceHolder];
 	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
-
-	UIFont * parentFont = self.regularFont;
-
+    
 	NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
                                                                                     attributes:attributes];
-
+    
 	if (parentTag)
 	{
 		if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
 		{
-			parentFont = self.boldFont;
+			parentFont  = self.boldFont;
+            parentColor = self.boldTextColor;
 		}
 		if ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"])
 		{
-			parentFont = self.italicFont;
+			parentFont  = self.italicFont;
+            parentColor = self.italicTextColor;
 		}
 	}
-
+    
 	NSRange tagRange = [attrString.string rangeOfRegex:@"<[^/>]+>"];
-
+    
 	do
 	{
 		if (tagRange.location != NSNotFound)
@@ -243,63 +278,68 @@
 			NSString * searchTag = [attrString.string substringWithRange:tagRange];
 			searchTag            = [searchTag stringByReplacingOccurrencesOfString:@"<" withString:@""];
 			searchTag            = [searchTag stringByReplacingOccurrencesOfString:@">" withString:@""];
-
+            
 			// Remove attributes from tag
 			if ([searchTag rangeOfRegex:@" "].location != NSNotFound)
 			{
 				NSInteger location = [searchTag rangeOfRegex:@" "].location;
 				searchTag          = [searchTag stringByReplacingCharactersInRange:NSMakeRange(location, [searchTag length]-location) withString:@""];
 			}
-
-			//NSLog(@"searchTag => %@", searchTag);
-
+            
 			NSString * regString = [NSString stringWithFormat:@"<%@[^>]*>(.*?)</%@>", searchTag, searchTag];
-			NSRange match = [attrString.string rangeOfRegex:regString];
-
+			NSRange    match     = [attrString.string rangeOfRegex:regString];
+            
 			if (match.location != NSNotFound)
 			{
 				NSString * innerString = [attrString.string substringWithRange:match];
-				innerString = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag] withString:@""];
-				innerString = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag] withString:@""];
-
-				//NSLog(@"Found: regString:%@ match(%i,%i) htmlInnerString:%@", regString, match.location, match.length, innerString);
-
-				UIFont * matchFont = parentFont;
-
+				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag] withString:@""];
+				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag] withString:@""];
+                
+				UIFont  * matchFont  = parentFont;
+                UIColor * matchColor = parentColor;
+                
 				if ([searchTag isEqualToString:@"b"] || [searchTag isEqualToString:@"strong"])
 				{
-					matchFont = self.boldFont;
-
+					matchFont  = self.boldFont;
+                    matchColor = self.boldTextColor;
+                    
 					if (parentTag && ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"]))
 					{
-						matchFont = self.boldItalicFont;
+						matchFont  = self.boldItalicFont;
+                        matchColor = self.boldItalicTextColor;
 					}
 				}
 				if ([searchTag isEqualToString:@"i"] || [searchTag isEqualToString:@"em"])
 				{
-					matchFont = self.italicFont;
-
+					matchFont  = self.italicFont;
+                    matchColor = self.italicTextColor;
+                    
 					if (parentTag && ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"]))
 					{
-						matchFont = self.boldItalicFont;
+						matchFont  = self.boldItalicFont;
+                        matchColor = self.boldItalicTextColor;
 					}
 				}
-
-                [attributes setValue:matchFont forKey:(id)kCTFontAttributeName];
-
+                
+                [attributes setValue:matchFont
+                              forKey:(id)kCTFontAttributeName];
+                
+                [attributes setValue:(id)matchColor.CGColor
+                              forKey:(id)kCTForegroundColorAttributeName];
+                
 				NSMutableAttributedString * innerAttrString = [[NSMutableAttributedString alloc] initWithString:innerString attributes:attributes];
-
+                
 				NSRange innerMatch = [innerAttrString.string rangeOfRegex:@"<[^/>]+>(.*?)</[^>]+>"];
 				if (innerMatch.location != NSNotFound)
 				{
 					NSString * nestedInnerString = [innerAttrString.string substringWithRange:innerMatch];
-
+                    
 					NSAttributedString * nestedAttrString = [self attributedStringByHTML:nestedInnerString
                                                                                parentTag:searchTag];
-
+                    
 					[innerAttrString replaceCharactersInRange:innerMatch withAttributedString:nestedAttrString];
 				}
-
+                
 				[attrString replaceCharactersInRange:match
                                 withAttributedString:innerAttrString];
 			}
@@ -307,17 +347,17 @@
             {
 				NSLog(@"NOT found: regString:%@ match(%i,%i) %@", regString, match.location, match.length, attrString.string);
 			}
-
+            
 			tagRange = [attrString.string rangeOfRegex:@"<[^>]+>"];
 		}
-
+        
 	}
 	while (tagRange.location != NSNotFound);
-
+    
 	NSRange newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
-
-    [attributes setValue:self.regularFont forKey:(id)kCTFontAttributeName];
-
+    
+    [attributes setValue:self.font forKey:(id)kCTFontAttributeName];
+    
 	do
 	{
 		if (newLinePlaceholder.location != NSNotFound)
