@@ -7,8 +7,7 @@ Simple UILabel replacement to display NSAttributedString by HTML in iOS applicat
 
 ``` objective-c
     CoreTextLabel * label  = [[CoreTextLabel alloc] initWithFrame:frame];
-    label.defaultFontSize  = 20.f;
-    label.attributedString = [label attributedStringByHTML:htmlString];
+    label.string           = [label attributedStringByHTML:htmlString];
     [label sizeToFit];
     [self.view addSubview:label];
 ```
