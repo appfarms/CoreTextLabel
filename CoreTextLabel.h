@@ -22,21 +22,24 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
-#import <CoreText/CoreText.h>
 
 @interface CoreTextLabel : UIView
+
+@property (nonatomic, retain) NSMutableAttributedString * string;              /**< Default: nil */
 
 @property (nonatomic, retain) UIFont                    * font;                /**< Default: [UIFont systemFontOfSize:] */
 @property (nonatomic, retain) UIFont                    * boldFont;            /**< Default: [UIFont boldSystemFontOfSize:] */
 @property (nonatomic, retain) UIFont                    * italicFont;          /**< Default: [UIFont italicSystemFontOfSize:] */
 @property (nonatomic, retain) UIFont                    * boldItalicFont;      /**< Default: [UIFont italicSystemFontOfSize:] */
+
 @property (nonatomic, retain) UIColor                   * textColor;           /**< Default: [UIColor blackColor] */
 @property (nonatomic, retain) UIColor                   * boldTextColor;       /**< Default: self.textColor */
 @property (nonatomic, retain) UIColor                   * italicTextColor;     /**< Default: self.textColor */
 @property (nonatomic, retain) UIColor                   * boldItalicTextColor; /**< Default: self.textColor */
-@property (nonatomic, retain) NSMutableAttributedString * attributedString;    /**< Default: nil */
+
 @property (nonatomic, assign) CGFloat                     defaultFontSize;     /**< Default font size used if no fonts defined from outside => 18.f */
+
+@property (nonatomic, assign) NSUInteger                  numberOfLines;       /**< Determines the number of lines to draw and what to do when sizeToFit is called. default value is 0 (no limit) */
 
 /**
  * Create NSMutableAttributedString by HTML string

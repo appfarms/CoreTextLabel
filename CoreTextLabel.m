@@ -22,8 +22,11 @@
 //
 
 #import "CoreTextLabel.h"
-#import "RegexKitLite.h"
 
+#import <QuartzCore/QuartzCore.h>
+#import <CoreText/CoreText.h>
+
+#import "RegexKitLite.h"
 
 #define CORE_TEXT_SUPPORTED() ([[[UIDevice currentDevice] systemVersion] floatValue] >= 3.2)
 
@@ -37,16 +40,18 @@
 
 @implementation CoreTextLabel
 
+@synthesize string              = _string;
+
 @synthesize font                = _font;
 @synthesize boldFont            = _boldFont;
 @synthesize italicFont          = _italicFont;
 @synthesize boldItalicFont      = _boldItalicFont;
+
 @synthesize textColor           = _textColor;
 @synthesize boldTextColor       = _boldTextColor;
 @synthesize italicTextColor     = _italicTextColor;
 @synthesize boldItalicTextColor = _boldItalicTextColor;
-@synthesize attributedTextLayer = _attributedTextLayer;
-@synthesize attributedString    = _attributedString;
+
 @synthesize defaultFontSize     = _defaultFontSize;
 
 - (id) initWithFrame:(CGRect)frame
@@ -60,25 +65,9 @@
     
 	if (self)
 	{
+        [self setContentMode:UIViewContentModeRedraw];
 		self.backgroundColor = [UIColor clearColor];
-        
-        _defaultFontSize                   = 18.f;
-		_attributedTextLayer               = [CATextLayer new];
-		_attributedTextLayer.frame         = self.bounds;
-		_attributedTextLayer.contentsScale = [[UIScreen mainScreen] scale];
-        
-		[self.layer addSublayer:_attributedTextLayer];
-        
-        self.layer.actions = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                              [NSNull null], @"onOrderIn",
-                              [NSNull null], @"onOrderOut",
-                              [NSNull null], @"sublayers",
-                              [NSNull null], @"contents",
-                              [NSNull null], @"bounds",
-                              [NSNull null], @"position",
-                              nil];
-        
-        _attributedTextLayer.actions = self.layer.actions;
+        _defaultFontSize     = 18.f;
 	}
     
 	return self;
@@ -167,57 +156,109 @@
     return _boldItalicTextColor;
 }
 
-#pragma mark - Setter
-
-- (void) setAttributedString:(NSMutableAttributedString *)attributedString
-{
-	_attributedString           = attributedString;
-    _attributedTextLayer.string = _attributedString;
-	[self setNeedsLayout];
-}
-
 #pragma mark - Layout
-
-- (CGSize)suggestSizeAndFitRange:(CFRange *)range forAttributedString:(NSMutableAttributedString *)attrString usingSize:(CGSize)referenceSize
-{
-    CTFramesetterRef framesetter   = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)attrString);
-    CGSize           suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter,
-                                                                                  CFRangeMake(0, [attrString length]),
-                                                                                  NULL,
-                                                                                  referenceSize,
-                                                                                  range);
-    
-    // HACK: There is a bug in Core Text where suggested size is not quite right
-    // I'm padding it with half line height to make up for the bug.
-    // see the coretext-dev list: http://web.archiveorange.com/archive/v/nagQXwVJ6Gzix0veMh09
-    CTLineRef line = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)attrString);
-    CGFloat ascent, descent, leading;
-    CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-    CGFloat lineHeight = ascent + descent + leading;
-    suggestedSize.height += lineHeight / 2.f;
-    
-    return suggestedSize;
-}
-
-- (void) layoutSubviews
-{
-    [super layoutSubviews];
-    _attributedTextLayer.frame   = self.bounds;
-    _attributedTextLayer.wrapped = YES;
-}
 
 - (void) sizeToFit
 {
-    CFRange fitRange;
-    CGRect  textDisplayRect = CGRectMake(0, 0, self.bounds.size.width, 99999);
-    CGSize  recommendedSize = [self suggestSizeAndFitRange:&fitRange
-                                       forAttributedString:_attributedString
-                                                 usingSize:textDisplayRect.size];
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 9000);
     
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, recommendedSize.height);
+    CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+    CFRange          fullStringRange = CFRangeMake(0, self.string.string.length);
     
-    _attributedTextLayer.frame   = self.bounds;
-    _attributedTextLayer.wrapped = YES;
+    CGMutablePathRef framePath = CGPathCreateMutable();
+    CGPathAddRect(framePath, nil, self.bounds);
+    CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    
+    CFArrayRef lines = CTFrameGetLines(aFrame);
+    CFIndex    count = CFArrayGetCount(lines);
+    
+    // Limit lines if self.numberOfLines != 0
+    if (self.numberOfLines != 0 && count > self.numberOfLines)
+    {
+        count = self.numberOfLines;
+    }
+    
+    CGPoint origins[count];
+    CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins);
+    
+    CGFloat ascent, descent, leading, width;
+    CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, count-1);
+    width = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
+    
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, ceilf(self.bounds.size.height - origins[count-1].y + descent));
+}
+
+- (void) drawRect:(CGRect)rect
+{
+    [super drawRect:rect];
+    
+    // Fetch the context
+	CGContextRef context = UIGraphicsGetCurrentContext();
+    
+	// Flip the coordinate system
+	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+	CGContextTranslateCTM(context, 0, self.bounds.size.height);
+	CGContextScaleCTM(context, 1.0, -1.0);
+    
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+    CFRange fullStringRange = CFRangeMake(0, self.string.string.length);
+    
+    CGMutablePathRef framePath = CGPathCreateMutable();
+    CGPathAddRect(framePath, nil, rect);
+    CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    
+    CFArrayRef lines = CTFrameGetLines(aFrame);
+    CFIndex    count = CFArrayGetCount(lines);
+    
+    // Limit lines if self.numberOfLines != 0
+    if (self.numberOfLines != 0 && count > self.numberOfLines)
+    {
+        count = self.numberOfLines;
+    }
+    
+    CGPoint origins[count];
+    CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins); // Fill origins[] buffer.
+    
+    // Draw every line but the last one
+    for (CFIndex i = 0; i < count-1; i++)
+    {
+        CGContextSetTextPosition(context, origins[i].x, origins[i].y);
+        CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
+        CTLineDraw(line, context);
+    }
+    
+    // Truncate the last line before drawing it
+    CGPoint lastOrigin = origins[count-1];
+    CTLineRef lastLine = CFArrayGetValueAtIndex(lines, count-1);
+    
+    // Truncation token is a CTLineRef itself
+    NSRange effectiveRange = NSMakeRange(0, 0);
+    CFAttributedStringRef truncationString = CFAttributedStringCreate(NULL, CFSTR("\u2026"), (__bridge CFDictionaryRef)([self.string attributesAtIndex:0 effectiveRange:&effectiveRange]));
+    CTLineRef truncationToken = CTLineCreateWithAttributedString(truncationString);
+    CFRelease(truncationString);
+    
+    // Range to cover everything from the start of lastLine to the end of the string
+    CFRange rng = CFRangeMake(CTLineGetStringRange(lastLine).location, 0);
+    rng.length = CFAttributedStringGetLength((__bridge CFAttributedStringRef)self.string) - rng.location;
+    
+    // Substring with that range
+    NSAttributedString * longString = [self.string attributedSubstringFromRange:NSMakeRange(rng.location, rng.length)];
+    
+    // Line for that string
+    CTLineRef longLine = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)longString);
+    
+    CTLineRef truncated = CTLineCreateTruncatedLine(longLine, rect.size.width, kCTLineTruncationEnd, truncationToken);
+    CFRelease(longLine);
+    CFRelease(truncationToken);
+    
+    // If 'truncated' is NULL, then no truncation was required to fit it
+    if (truncated == NULL)
+        truncated = (CTLineRef)CFRetain(lastLine);
+    
+    // Draw new line at the same offset as the non-truncated version
+    CGContextSetTextPosition(context, lastOrigin.x, lastOrigin.y);
+    CTLineDraw(truncated, context);
+    CFRelease(truncated);
 }
 
 #pragma mark - HTML

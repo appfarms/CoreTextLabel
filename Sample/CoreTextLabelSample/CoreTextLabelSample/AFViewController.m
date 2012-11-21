@@ -26,49 +26,58 @@
 
 @interface AFViewController ()
 
+@property (nonatomic, retain) CoreTextLabel * label;
+
 @end
 
 @implementation AFViewController
 
-- (void) loadView
-{
-    [super loadView];
-    
-    CGFloat padding = 10.f;
-    CGFloat width   = self.view.frame.size.width;
-    CGRect frame    = CGRectMake(padding, padding, width-padding*2.f, 800);
-    
-    UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:24.f];
-    UIFont   * boldFont            = [UIFont fontWithName:@"Verdana-Bold" size:24.f];
-    UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:24.f];
-    UIFont   * boldItalicFont      = [UIFont fontWithName:@"Verdana-BoldItalic" size:24.f];
-    
-    UIColor  * boldTextColor       = [UIColor blueColor];
-    UIColor  * boldItalicTextColor = [UIColor redColor];
-    UIColor  * italicTextColor     = [UIColor yellowColor];
-    
-    NSString * htmlPath            = [[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"];
-    NSString * htmlString          = [NSString stringWithContentsOfFile:htmlPath
-                                                               encoding:NSUTF8StringEncoding
-                                                                  error:nil];
-    
-    CoreTextLabel * label     = [[CoreTextLabel alloc] initWithFrame:frame];
-    label.font                = regularFont;
-    label.boldFont            = boldFont;
-    label.italicFont          = italicFont;
-    label.boldItalicFont      = boldItalicFont;
-    label.boldTextColor       = boldTextColor;
-    label.boldItalicTextColor = boldItalicTextColor;
-    label.italicTextColor     = italicTextColor;
-    label.attributedString    = [label attributedStringByHTML:htmlString];
-    [label sizeToFit];
-    
-    [self.view addSubview:label];
-}
-
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    self.view.backgroundColor = [UIColor lightGrayColor];
+    
+    if (!_label)
+    {
+        CGRect frame = CGRectMake(10, 10, self.view.frame.size.width-20, self.view.frame.size.height-20);
+        
+        UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:24.f];
+        UIFont   * boldFont            = [UIFont fontWithName:@"Verdana-Bold" size:24.f];
+        UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:24.f];
+        UIFont   * boldItalicFont      = [UIFont fontWithName:@"Verdana-BoldItalic" size:24.f];
+        
+        UIColor  * boldTextColor       = [UIColor blueColor];
+        UIColor  * boldItalicTextColor = [UIColor redColor];
+        UIColor  * italicTextColor     = [UIColor yellowColor];
+        
+        NSString * html                = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"]
+                                                                   encoding:NSUTF8StringEncoding
+                                                                      error:nil];
+        
+        _label                     = [[CoreTextLabel alloc] initWithFrame:frame];
+        _label.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+        _label.font                = regularFont;
+        _label.boldFont            = boldFont;
+        _label.italicFont          = italicFont;
+        _label.boldItalicFont      = boldItalicFont;
+        _label.boldTextColor       = boldTextColor;
+        _label.boldItalicTextColor = boldItalicTextColor;
+        _label.italicTextColor     = italicTextColor;
+        _label.string              = [_label attributedStringByHTML:html];
+        
+        [self.view addSubview:_label];
+    }
+}
+
+- (BOOL) shouldAutorotate
+{
+    return YES;
+}
+
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+    return YES;
 }
 
 @end
