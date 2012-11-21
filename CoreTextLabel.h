@@ -38,8 +38,8 @@
 @property (nonatomic, retain) UIColor                   * boldItalicTextColor; /**< Default: self.textColor */
 
 @property (nonatomic, assign) CGFloat                     defaultFontSize;     /**< Default font size used if no fonts defined from outside => 18.f */
-
 @property (nonatomic, assign) NSUInteger                  numberOfLines;       /**< Determines the number of lines to draw and what to do when sizeToFit is called. default value is 0 (no limit) */
+@property (nonatomic, assign) CGFloat                     lineSpacing;         /**< Default 0.f */
 
 /**
  * Create NSMutableAttributedString by HTML string

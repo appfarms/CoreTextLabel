@@ -53,24 +53,43 @@
 @synthesize boldItalicTextColor = _boldItalicTextColor;
 
 @synthesize defaultFontSize     = _defaultFontSize;
+@synthesize numberOfLines       = _numberOfLines;
+@synthesize lineSpacing         = _lineSpacing;
 
 - (id) initWithFrame:(CGRect)frame
 {
-    if (CORE_TEXT_SUPPORTED() == NO)
-	{
-		return nil;
-	}
-    
 	self = [super initWithFrame:frame];
     
 	if (self)
 	{
-        [self setContentMode:UIViewContentModeRedraw];
-		self.backgroundColor = [UIColor clearColor];
-        _defaultFontSize     = 18.f;
+        [self setupInitDefaults];
 	}
     
 	return self;
+}
+
+- (id) init
+{
+	self = [super init];
+    
+	if (self)
+	{
+        [self setupInitDefaults];
+	}
+    
+	return self;
+}
+
+- (void) setupInitDefaults
+{
+    // Force redraw on layout or frame changes
+    [self setContentMode:UIViewContentModeRedraw];
+    
+    // Set default background color to clear
+    self.backgroundColor = [UIColor clearColor];
+    
+    _defaultFontSize     = 18.f;
+    _lineSpacing         = 0.f;
 }
 
 #pragma mark - Getter
@@ -164,7 +183,7 @@
     
     CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
     CFRange          fullStringRange = CFRangeMake(0, self.string.string.length);
-    
+        
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, self.bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
@@ -273,9 +292,21 @@
 	CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
     CGColorRef parentColor = self.textColor.CGColor;
     
+    if (_lineSpacing < 0.f)
+    {
+        _lineSpacing = 0.f;
+    }
+    
+    CTParagraphStyleSetting setting[1] = {
+        {kCTParagraphStyleSpecifierMinimumLineSpacing, sizeof(CGFloat), &_lineSpacing}
+    };
+    
+    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(setting, 1);
+    
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         (__bridge id)parentFont,  (id)kCTFontAttributeName,
                                         (__bridge id)parentColor, (id)kCTForegroundColorAttributeName,
+                                        (__bridge id)paragraphStyle, (id)kCTParagraphStyleAttributeName,
                                         nil];
     
 	if (!html)

@@ -42,10 +42,10 @@
     {
         CGRect frame = CGRectMake(10, 10, self.view.frame.size.width-20, self.view.frame.size.height-20);
         
-        UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:24.f];
+        UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:18.f];
         UIFont   * boldFont            = [UIFont fontWithName:@"Verdana-Bold" size:24.f];
-        UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:24.f];
-        UIFont   * boldItalicFont      = [UIFont fontWithName:@"Verdana-BoldItalic" size:24.f];
+        UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:18.f];
+        UIFont   * boldItalicFont      = [UIFont fontWithName:@"Verdana-BoldItalic" size:18.f];
         
         UIColor  * boldTextColor       = [UIColor blueColor];
         UIColor  * boldItalicTextColor = [UIColor redColor];
@@ -64,6 +64,7 @@
         _label.boldTextColor       = boldTextColor;
         _label.boldItalicTextColor = boldItalicTextColor;
         _label.italicTextColor     = italicTextColor;
+        _label.lineSpacing         = 10.f;
         _label.string              = [_label attributedStringByHTML:html];
         
         [self.view addSubview:_label];
