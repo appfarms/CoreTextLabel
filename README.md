@@ -1,7 +1,7 @@
 CoreTextLabel
 =============
 
-Simple UILabel replacement to display NSAttributedString by HTML in iOS applications (>= 3.2).
+UILabel replacement to draw NSAttributedString or HTML with custom font and color in iOS applications. "numberOfLines" and "truncation" (NSLineBreakByTruncatingTail) is supported.
 
 ## Example
 
