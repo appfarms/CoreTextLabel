@@ -270,12 +270,12 @@
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag
 {
-	UIFont  * parentFont  = self.font;
-    UIColor * parentColor = self.textColor;
+	CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
+    CGColorRef parentColor = self.textColor.CGColor;
     
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        parentFont,          (id)NSFontAttributeName,
-                                        parentColor.CGColor, (id)kCTForegroundColorAttributeName,
+                                        (__bridge id)parentFont,  (id)kCTFontAttributeName,
+                                        (__bridge id)parentColor, (id)kCTForegroundColorAttributeName,
                                         nil];
     
 	if (!html)
@@ -299,13 +299,13 @@
 	{
 		if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
 		{
-			parentFont  = self.boldFont;
-            parentColor = self.boldTextColor;
+			parentFont  = CTFontCreateFromUIFont(self.boldFont);
+            parentColor = self.boldTextColor.CGColor;
 		}
 		if ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"])
 		{
-			parentFont  = self.italicFont;
-            parentColor = self.italicTextColor;
+			parentFont  = CTFontCreateFromUIFont(self.italicFont);
+            parentColor = self.italicTextColor.CGColor;
 		}
 	}
     
@@ -336,36 +336,36 @@
 				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag] withString:@""];
 				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag] withString:@""];
                 
-				UIFont  * matchFont  = parentFont;
-                UIColor * matchColor = parentColor;
+				CTFontRef  matchFont  = parentFont;
+                CGColorRef matchColor = parentColor;
                 
 				if ([searchTag isEqualToString:@"b"] || [searchTag isEqualToString:@"strong"])
 				{
-					matchFont  = self.boldFont;
-                    matchColor = self.boldTextColor;
+					matchFont  = CTFontCreateFromUIFont(self.boldFont);
+                    matchColor = self.boldTextColor.CGColor;
                     
 					if (parentTag && ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"]))
 					{
-						matchFont  = self.boldItalicFont;
-                        matchColor = self.boldItalicTextColor;
+						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
+                        matchColor = self.boldItalicTextColor.CGColor;
 					}
 				}
 				if ([searchTag isEqualToString:@"i"] || [searchTag isEqualToString:@"em"])
 				{
-					matchFont  = self.italicFont;
-                    matchColor = self.italicTextColor;
+					matchFont  = CTFontCreateFromUIFont(self.italicFont);
+                    matchColor = self.italicTextColor.CGColor;
                     
 					if (parentTag && ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"]))
 					{
-						matchFont  = self.boldItalicFont;
-                        matchColor = self.boldItalicTextColor;
+						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
+                        matchColor = self.boldItalicTextColor.CGColor;
 					}
 				}
                 
-                [attributes setValue:matchFont
+                [attributes setValue:(__bridge id)matchFont
                               forKey:(id)kCTFontAttributeName];
                 
-                [attributes setValue:(id)matchColor.CGColor
+                [attributes setValue:(__bridge id)matchColor
                               forKey:(id)kCTForegroundColorAttributeName];
                 
 				NSMutableAttributedString * innerAttrString = [[NSMutableAttributedString alloc] initWithString:innerString attributes:attributes];
@@ -413,6 +413,13 @@
 	while (newLinePlaceholder.location != NSNotFound);
     
 	return attrString;
+}
+
+CTFontRef CTFontCreateFromUIFont(UIFont * font)
+{
+    return CTFontCreateWithName((__bridge CFStringRef)font.fontName,
+                                font.pointSize,
+                                NULL);
 }
 
 @end
