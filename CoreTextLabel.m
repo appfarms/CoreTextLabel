@@ -200,11 +200,17 @@
     CGPoint origins[count];
     CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins);
     
-    CGFloat ascent, descent, leading, width;
-    CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, count-1);
-    width = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
+    CGFloat height = 0.f;
     
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, ceilf(self.bounds.size.height - origins[count-1].y + descent));
+    if (count-1 >= 0)
+    {
+        CGFloat ascent, descent, leading, width;
+        CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, count-1);
+        width          = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
+        height         = ceilf(self.bounds.size.height - origins[count-1].y + descent);
+    }
+    
+    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, height);
 }
 
 - (void) drawRect:(CGRect)rect
