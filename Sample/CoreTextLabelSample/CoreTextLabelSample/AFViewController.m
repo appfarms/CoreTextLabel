@@ -64,7 +64,7 @@
         _label.boldTextColor       = boldTextColor;
         _label.boldItalicTextColor = boldItalicTextColor;
         _label.italicTextColor     = italicTextColor;
-        _label.lineSpacing         = 10.f;
+        _label.lineSpacing         = 0.f;
         _label.string              = [_label attributedStringByHTML:html];
         
         [self.view addSubview:_label];

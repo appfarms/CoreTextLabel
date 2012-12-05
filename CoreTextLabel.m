@@ -182,11 +182,17 @@
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 9000);
     
     CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
-    CFRange          fullStringRange = CFRangeMake(0, self.string.string.length);
-        
+    CFRange          fullStringRange = CFRangeMake(0, self.string.length);
+    
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, self.bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    
+    if (!aFrame)
+    {
+        self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 0.f);
+        return;
+    }
     
     CFArrayRef lines = CTFrameGetLines(aFrame);
     CFIndex    count = CFArrayGetCount(lines);
@@ -226,11 +232,16 @@
 	CGContextScaleCTM(context, 1.0, -1.0);
     
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
-    CFRange fullStringRange = CFRangeMake(0, self.string.string.length);
+    CFRange fullStringRange = CFRangeMake(0, self.string.length);
     
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, rect);
     CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    
+    if (!aFrame)
+    {
+        return;
+    }
     
     CFArrayRef lines = CTFrameGetLines(aFrame);
     CFIndex    count = CFArrayGetCount(lines);
