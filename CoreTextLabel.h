@@ -25,22 +25,94 @@
 
 @interface CoreTextLabel : UIView
 
-@property (nonatomic, retain) NSMutableAttributedString * string;              /**< Default: nil */
+/**
+ Attributed string to be drawn
+ */
+@property (nonatomic, retain) NSMutableAttributedString * string;
 
-@property (nonatomic, retain) UIFont                    * font;                /**< Default: [UIFont systemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * boldFont;            /**< Default: [UIFont boldSystemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * italicFont;          /**< Default: [UIFont italicSystemFontOfSize:] */
-@property (nonatomic, retain) UIFont                    * boldItalicFont;      /**< Default: [UIFont italicSystemFontOfSize:] */
 
-@property (nonatomic, retain) UIColor                   * textColor;           /**< Default: [UIColor blackColor] */
-@property (nonatomic, retain) UIColor                   * boldTextColor;       /**< Default: self.textColor */
-@property (nonatomic, retain) UIColor                   * italicTextColor;     /**< Default: self.textColor */
-@property (nonatomic, retain) UIColor                   * boldItalicTextColor; /**< Default: self.textColor */
+/**
+ Regular font used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIFont systemFontOfSize:]
+ */
+@property (nonatomic, retain) UIFont * font;
 
-@property (nonatomic, assign) CGFloat                     defaultFontSize;     /**< Default font size used if no fonts defined from outside => 18.f */
-@property (nonatomic, assign) NSUInteger                  numberOfLines;       /**< Determines the number of lines to draw and what to do when sizeToFit is called. default value is 0 (no limit) */
-@property (nonatomic, assign) CGFloat                     lineSpacing;         /**< Default 0.f */
-@property (nonatomic, assign) NSTextAlignment             textAlignment;
+/**
+ Bold font used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIFont boldSystemFontOfSize:]
+ */
+@property (nonatomic, retain) UIFont * boldFont;
+
+/**
+ Italic font used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIFont italicSystemFontOfSize:]
+ */
+@property (nonatomic, retain) UIFont * italicFont;
+
+/**
+ Bold italic font used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIFont italicSystemFontOfSize:]
+ */
+@property (nonatomic, retain) UIFont * boldItalicFont;
+
+/**
+ Text color used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIColor blackColor]
+ */
+@property (nonatomic, retain) UIColor * textColor;
+
+/**
+ Bold text color used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default self.textColor
+ */
+@property (nonatomic, retain) UIColor * boldTextColor;
+
+/**
+ Italic text color used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default self.textColor
+ */
+@property (nonatomic, retain) UIColor * italicTextColor;
+
+/**
+ Bold italic text color used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default self.textColor
+ */
+@property (nonatomic, retain) UIColor * boldItalicTextColor;
+
+/**
+ Font size used to create NSMutableAttributedString with -attributedStringByHTML: if used with default fonts
+ 
+ @default 18.f
+ */
+@property (nonatomic, assign) CGFloat defaultFontSize;
+
+/**
+ Determines the number of lines to draw and what to do when sizeToFit is called. 
+ @default 0 (no limit)
+ */
+@property (nonatomic, assign) NSUInteger numberOfLines;
+
+/**
+ Line spacing
+ 
+ @default 0.f
+ */
+@property (nonatomic, assign) CGFloat lineSpacing;
+
+/**
+ Text alignment
+ 
+ @default NSTextAlignmentLeft
+ */
+@property (nonatomic, assign) NSTextAlignment textAlignment; // NSInteger
 
 /**
  * Create NSMutableAttributedString by HTML string
