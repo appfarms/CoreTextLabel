@@ -96,9 +96,22 @@
 
 /**
  Determines the number of lines to draw and what to do when sizeToFit is called. 
+
  @default 0 (no limit)
  */
 @property (nonatomic, assign) NSUInteger numberOfLines;
+
+/**
+ Number of columns to be drawn
+ 
+ @default 1 (values lower 1 will be ignored)
+ */
+@property (nonatomic, assign) NSUInteger numberOfColumns;
+
+/**
+ Column margin
+ */
+@property (nonatomic, assign) CGFloat columnMargin;
 
 /**
  Line spacing
@@ -112,7 +125,8 @@
  
  @default NSTextAlignmentLeft
  */
-@property (nonatomic, assign) NSTextAlignment textAlignment; // NSInteger
+@property (nonatomic, assign) NSTextAlignment textAlignment;
+
 
 /**
  * Create NSMutableAttributedString by HTML string

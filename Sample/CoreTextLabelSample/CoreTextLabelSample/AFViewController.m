@@ -40,8 +40,6 @@
     
     if (!_label)
     {
-        CGRect frame = CGRectMake(10, 10, self.view.frame.size.width-20, self.view.frame.size.height-20);
-        
         UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:18.f];
         UIFont   * boldFont            = [UIFont fontWithName:@"Verdana-Bold" size:24.f];
         UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:18.f];
@@ -51,12 +49,7 @@
         UIColor  * boldItalicTextColor = [UIColor redColor];
         UIColor  * italicTextColor     = [UIColor yellowColor];
         
-        NSString * html                = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"]
-                                                                   encoding:NSUTF8StringEncoding
-                                                                      error:nil];
-        
-        _label                     = [[CoreTextLabel alloc] initWithFrame:frame];
-        _label.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+        _label                     = [[CoreTextLabel alloc] initWithFrame:[self labelFrame]];
         _label.font                = regularFont;
         _label.boldFont            = boldFont;
         _label.italicFont          = italicFont;
@@ -66,7 +59,11 @@
         _label.italicTextColor     = italicTextColor;
         _label.lineSpacing         = 0.f;
         _label.textAlignment       = NSTextAlignmentJustified;
-        _label.string              = [_label attributedStringByHTML:html];
+        
+        _label.numberOfColumns     = 3;
+        _label.columnMargin        = 10.f;
+        
+        _label.string              = [_label attributedStringByHTML:[self html]];
         
         [self.view addSubview:_label];
     }
@@ -80,6 +77,24 @@
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
     return YES;
+}
+
+- (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    _label.frame = [self labelFrame];
+}
+
+- (CGRect) labelFrame
+{
+    CGFloat padding = 10.f;
+    return CGRectMake(padding, padding, self.view.frame.size.width-padding*2.f, self.view.frame.size.height-padding*2.f);
+}
+
+- (NSString *) html
+{
+    return [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"Sample" ofType:@"html"]
+                                     encoding:NSUTF8StringEncoding
+                                        error:nil];
 }
 
 @end

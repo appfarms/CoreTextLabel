@@ -40,7 +40,11 @@
         self.viewController = [[AFViewController alloc] initWithNibName:@"AFViewController_iPad" bundle:nil];
     }
 
-    self.window.rootViewController = self.viewController;
+    UINavigationController * nc = [[UINavigationController alloc] initWithRootViewController:self.viewController];
+    nc.navigationBarHidden      = YES;
+    
+    self.window.rootViewController = nc;
+    
     [self.window makeKeyAndVisible];
 
     return YES;

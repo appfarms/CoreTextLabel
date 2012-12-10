@@ -55,6 +55,8 @@
 @synthesize defaultFontSize     = _defaultFontSize;
 @synthesize numberOfLines       = _numberOfLines;
 @synthesize lineSpacing         = _lineSpacing;
+@synthesize numberOfColumns     = _numberOfColumns;
+@synthesize columnMargin        = _columnMargin;
 @synthesize textAlignment       = _textAlignment;
 
 - (id) initWithFrame:(CGRect)frame
@@ -225,6 +227,8 @@
 {
     [super drawRect:rect];
     
+    NSLog(@"drawRect rect => %@", NSStringFromCGRect(rect));
+    
     // Fetch the context
 	CGContextRef context = UIGraphicsGetCurrentContext();
     
@@ -245,58 +249,134 @@
         return;
     }
     
-    CFArrayRef lines = CTFrameGetLines(aFrame);
-    CFIndex    count = CFArrayGetCount(lines);
+    // Draw columns
+    CFArrayRef columnPaths = [self columnPaths];
+    CFIndex    pathCount   = CFArrayGetCount(columnPaths);
     
-    // Limit lines if self.numberOfLines != 0
-    if (self.numberOfLines != 0 && count > self.numberOfLines)
+    CFIndex startIndex = 0;
+    
+    int column;
+    for (column = 0; column < pathCount; column++)
     {
-        count = self.numberOfLines;
+        CGRect columnFrame = CGRectFromString([[self columnFrames] objectAtIndex:column]);
+        CGPathRef path = (CGPathRef)CFArrayGetValueAtIndex(columnPaths, column);
+        
+        // Create a frame for this column and draw it.
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(startIndex, 0), path, NULL);
+        
+        CFArrayRef lines = CTFrameGetLines(frame);
+        CFIndex    count = CFArrayGetCount(lines);
+        
+        CGPoint origins[count];
+        CTFrameGetLineOrigins(frame, CFRangeMake(0, count), origins); // Fill origins[] buffer.
+        
+        // Draw every line but the last one (in last column)
+        int total = (column == pathCount-1) ? count-1 : count;
+        for (CFIndex i = 0; i < total; i++)
+        {
+            CGPoint point = CGPointMake(origins[i].x + columnFrame.origin.x, origins[i].y);
+            CGContextSetTextPosition(context, point.x, point.y);
+            CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
+            CTLineDraw(line, context);
+        }
+        
+        // Draw last (truncated) line for last column
+        if (column == pathCount-1 && total < count)
+        {
+            // Truncate the last line before drawing it
+            CGPoint lastOrigin = origins[count-1];
+            CTLineRef lastLine = CFArrayGetValueAtIndex(lines, count-1);
+            
+            // Truncation token is a CTLineRef itself
+            NSRange effectiveRange = NSMakeRange(0, 0);
+            CFAttributedStringRef truncationString = CFAttributedStringCreate(NULL, CFSTR("\u2026"), (__bridge CFDictionaryRef)([self.string attributesAtIndex:0 effectiveRange:&effectiveRange]));
+            CTLineRef truncationToken = CTLineCreateWithAttributedString(truncationString);
+            CFRelease(truncationString);
+            
+            // Range to cover everything from the start of lastLine to the end of the string
+            CFRange rng = CFRangeMake(CTLineGetStringRange(lastLine).location, 0);
+            rng.length = CFAttributedStringGetLength((__bridge CFAttributedStringRef)self.string) - rng.location;
+            
+            // Substring with that range
+            NSAttributedString * longString = [self.string attributedSubstringFromRange:NSMakeRange(rng.location, rng.length)];
+            
+            // Line for that string
+            CTLineRef longLine = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)longString);
+            
+            CTLineRef truncated = CTLineCreateTruncatedLine(longLine, columnFrame.size.width, kCTLineTruncationEnd, truncationToken);
+            CFRelease(longLine);
+            CFRelease(truncationToken);
+            
+            // If 'truncated' is NULL, then no truncation was required to fit it
+            if (truncated == NULL)
+                truncated = (CTLineRef)CFRetain(lastLine);
+            
+            // Draw new line at the same offset as the non-truncated version
+            CGContextSetTextPosition(context, lastOrigin.x+columnFrame.origin.x, lastOrigin.y);
+            CTLineDraw(truncated, context);
+            CFRelease(truncated);
+        }
+        
+        // Start the next frame at the first character not visible in this frame.
+        CFRange frameRange = CTFrameGetVisibleStringRange(frame);
+        startIndex += frameRange.length;
+        CFRelease(frame);
+    }
+    CFRelease(columnPaths);
+}
+
+- (CFArrayRef) columnPaths
+{
+    NSArray        * frames = [self columnFrames];
+    CFMutableArrayRef array = CFArrayCreateMutable(kCFAllocatorDefault, frames.count, &kCFTypeArrayCallBacks);
+    int               column;
+    
+    for (column = 0; column < frames.count; column++)
+    {
+        CGMutablePathRef path = CGPathCreateMutable();
+        CGPathAddRect(path, NULL, CGRectFromString([frames objectAtIndex:column]));
+        CFArrayInsertValueAtIndex(array, column, path);
+        CFRelease(path);
     }
     
-    CGPoint origins[count];
-    CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins); // Fill origins[] buffer.
+    return array;
+}
+
+- (NSArray *) columnFrames
+{
+    CGRect bounds          = self.bounds;
+    int    numberOfColumns = MAX(self.numberOfColumns, 1);
+    int    column;
     
-    // Draw every line but the last one
-    for (CFIndex i = 0; i < count-1; i++)
+    CGRect columnRects[numberOfColumns];
+    
+    // Start by setting the first column to cover the entire view.
+    columnRects[0] = bounds;
+    
+    // Divide the columns equally across the frame's width.
+    CGFloat columnWidth = CGRectGetWidth(bounds) / numberOfColumns;
+    for (column = 0; column < numberOfColumns - 1; column++)
     {
-        CGContextSetTextPosition(context, origins[i].x, origins[i].y);
-        CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
-        CTLineDraw(line, context);
+        CGRectDivide(columnRects[column], &columnRects[column],&columnRects[column + 1], columnWidth, CGRectMinXEdge);
     }
     
-    // Truncate the last line before drawing it
-    CGPoint lastOrigin = origins[count-1];
-    CTLineRef lastLine = CFArrayGetValueAtIndex(lines, count-1);
+    // Add column margin
+    if (numberOfColumns > 1)
+    {
+        for (column = 0; column < numberOfColumns; column++)
+        {
+            columnRects[column] = CGRectInset(columnRects[column], _columnMargin, 0.f);
+        }
+    }
     
-    // Truncation token is a CTLineRef itself
-    NSRange effectiveRange = NSMakeRange(0, 0);
-    CFAttributedStringRef truncationString = CFAttributedStringCreate(NULL, CFSTR("\u2026"), (__bridge CFDictionaryRef)([self.string attributesAtIndex:0 effectiveRange:&effectiveRange]));
-    CTLineRef truncationToken = CTLineCreateWithAttributedString(truncationString);
-    CFRelease(truncationString);
+    // Create an array of layout paths, one for each column.
+    NSMutableArray * array = [NSMutableArray new];
+    for (column = 0; column < numberOfColumns; column++)
+    {
+        [array addObject:NSStringFromCGRect(columnRects[column])];
+    }
     
-    // Range to cover everything from the start of lastLine to the end of the string
-    CFRange rng = CFRangeMake(CTLineGetStringRange(lastLine).location, 0);
-    rng.length = CFAttributedStringGetLength((__bridge CFAttributedStringRef)self.string) - rng.location;
-    
-    // Substring with that range
-    NSAttributedString * longString = [self.string attributedSubstringFromRange:NSMakeRange(rng.location, rng.length)];
-    
-    // Line for that string
-    CTLineRef longLine = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)longString);
-    
-    CTLineRef truncated = CTLineCreateTruncatedLine(longLine, rect.size.width, kCTLineTruncationEnd, truncationToken);
-    CFRelease(longLine);
-    CFRelease(truncationToken);
-    
-    // If 'truncated' is NULL, then no truncation was required to fit it
-    if (truncated == NULL)
-        truncated = (CTLineRef)CFRetain(lastLine);
-    
-    // Draw new line at the same offset as the non-truncated version
-    CGContextSetTextPosition(context, lastOrigin.x, lastOrigin.y);
-    CTLineDraw(truncated, context);
-    CFRelease(truncated);
+    return array;
 }
 
 #pragma mark - HTML
@@ -459,7 +539,8 @@
     
 	NSRange newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
     
-    [attributes setValue:self.font forKey:(id)kCTFontAttributeName];
+    [attributes setValue:(__bridge id)(CTFontCreateFromUIFont(self.font))
+                  forKey:(id)kCTFontAttributeName];
     
 	do
 	{
