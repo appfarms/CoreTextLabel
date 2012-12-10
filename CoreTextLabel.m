@@ -55,6 +55,7 @@
 @synthesize defaultFontSize     = _defaultFontSize;
 @synthesize numberOfLines       = _numberOfLines;
 @synthesize lineSpacing         = _lineSpacing;
+@synthesize textAlignment       = _textAlignment;
 
 - (id) initWithFrame:(CGRect)frame
 {
@@ -90,6 +91,7 @@
     
     _defaultFontSize     = 18.f;
     _lineSpacing         = 0.f;
+    _textAlignment       = NSTextAlignmentLeft;
 }
 
 #pragma mark - Getter
@@ -314,11 +316,23 @@
         _lineSpacing = 0.f;
     }
     
-    CTParagraphStyleSetting setting[1] = {
-        {kCTParagraphStyleSpecifierMinimumLineSpacing, sizeof(CGFloat), &_lineSpacing}
+    CTTextAlignment textAlignment = CTTextAlignmentFromNSTextAlignment(_textAlignment);
+    
+    CTParagraphStyleSetting setting[2] =
+    {
+        {
+            kCTParagraphStyleSpecifierMinimumLineSpacing,
+            sizeof(CGFloat),
+            &_lineSpacing
+        },
+        {
+            kCTParagraphStyleSpecifierAlignment,
+            sizeof(CTTextAlignment),
+            &textAlignment
+        }
     };
     
-    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(setting, 1);
+    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(setting, 2);
     
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         (__bridge id)parentFont,  (id)kCTFontAttributeName,
@@ -468,6 +482,33 @@ CTFontRef CTFontCreateFromUIFont(UIFont * font)
     return CTFontCreateWithName((__bridge CFStringRef)font.fontName,
                                 font.pointSize,
                                 NULL);
+}
+
+CTTextAlignment CTTextAlignmentFromNSTextAlignment(NSTextAlignment textAlignment)
+{
+    switch (textAlignment)
+    {
+        case NSTextAlignmentRight:
+            return kCTTextAlignmentRight;
+            break;
+            
+        case NSTextAlignmentJustified:
+            return kCTTextAlignmentJustified;
+            break;
+            
+        case NSTextAlignmentCenter:
+            return kCTTextAlignmentCenter;
+            break;
+            
+        case NSTextAlignmentNatural:
+            return kCTTextAlignmentNatural;
+            break;
+            
+        case NSTextAlignmentLeft:
+        default:
+            return kCTTextAlignmentLeft;
+            break;
+    }
 }
 
 @end
