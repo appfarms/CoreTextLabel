@@ -227,7 +227,7 @@
 {
     [super drawRect:rect];
     
-    NSLog(@"drawRect rect => %@", NSStringFromCGRect(rect));
+    //NSLog(@"drawRect rect => %@", NSStringFromCGRect(rect));
     
     // Fetch the context
 	CGContextRef context = UIGraphicsGetCurrentContext();
@@ -420,11 +420,15 @@
                                         (__bridge id)paragraphStyle, (id)kCTParagraphStyleAttributeName,
                                         nil];
     
-	if (!html)
+	if (html == nil || [html isKindOfClass:[NSString class]] == NO)
 	{
 		return [[NSMutableAttributedString alloc] initWithString:@""
                                                       attributes:attributes];
 	}
+
+    // Remove "self closing" tags
+    html = [html stringByReplacingOccurrencesOfRegex:@"(<[a-zA-Z]+)([^>]+)(/>)"
+                                          withString:@""];
     
 	NSString * newLinePlaceHolder = @"{BR}";
     
