@@ -183,19 +183,26 @@
 
 - (void) sizeToFit
 {
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 9000);
+    CGRect frame = self.frame;
+    frame.size   = [self sizeThatFits:CGSizeMake(self.bounds.size.width, 10000.f)];
+    self.frame = frame;
+}
+
+- (CGSize) sizeThatFits:(CGSize)size
+{
+    CGSize calcSize = CGSizeZero;
+    CGRect bounds   = CGRectMake(0.f, 0.f, size.width, size.height);
     
     CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
     CFRange          fullStringRange = CFRangeMake(0, self.string.length);
     
     CGMutablePathRef framePath = CGPathCreateMutable();
-    CGPathAddRect(framePath, nil, self.bounds);
+    CGPathAddRect(framePath, nil, bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
     
     if (!aFrame)
     {
-        self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, 0.f);
-        return;
+        return calcSize;
     }
     
     CFArrayRef lines = CTFrameGetLines(aFrame);
@@ -210,17 +217,30 @@
     CGPoint origins[count];
     CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins);
     
-    CGFloat height = 0.f;
+    CGFloat calcHeight = 0.f;
+    CGFloat calcWidth  = 0.f;
     
-    if (count-1 >= 0)
+    if (count > 0)
     {
-        CGFloat ascent, descent, leading, width;
-        CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, count-1);
-        width          = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
-        height         = ceilf(self.bounds.size.height - origins[count-1].y + descent);
+        for (int lineIndex=0; lineIndex<count; lineIndex++)
+        {
+            CGFloat ascent, descent, leading, width;
+            
+            CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, lineIndex);
+            width          = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
+            calcHeight     = ceilf(bounds.size.height - origins[lineIndex].y + descent);
+            
+            if (width > calcWidth)
+            {
+                calcWidth = width;
+            }
+        }
     }
     
-    self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, height);
+    calcSize.width  = (calcWidth <= size.width)   ? calcWidth  : size.width;
+    calcSize.height = (calcHeight <= size.height) ? calcHeight : size.height;
+        
+    return calcSize;
 }
 
 - (void) drawRect:(CGRect)rect
@@ -327,9 +347,9 @@
 
 - (CFArrayRef) columnPaths
 {
-    NSArray        * frames = [self columnFrames];
-    CFMutableArrayRef array = CFArrayCreateMutable(kCFAllocatorDefault, frames.count, &kCFTypeArrayCallBacks);
-    int               column;
+    NSArray           * frames = [self columnFrames];
+    CFMutableArrayRef   array = CFArrayCreateMutable(kCFAllocatorDefault, frames.count, &kCFTypeArrayCallBacks);
+    int                 column;
     
     for (column = 0; column < frames.count; column++)
     {
