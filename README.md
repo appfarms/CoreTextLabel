@@ -1,7 +1,8 @@
 CoreTextLabel
 =============
 
-UILabel replacement to draw NSAttributedString or HTML with custom font and color in iOS applications. "numberOfLines" and "truncation" (NSLineBreakByTruncatingTail) is supported.
+With CoreTextLabel you are able draw NSAttributedString or HTML with custom font and color in iOS (>= 5.0) applications. 
+"numberOfLines" and "truncation" (NSLineBreakByTruncatingTail) is also supported.
 
 ## Example
 
@@ -44,7 +45,7 @@ $ open App.xcworkspace
 
 ## Requirements
 
-CoreTextLabel 1.0 and higher requires iOS 3.2 and above.
+CoreTextLabel 1.0 and higher requires iOS 5.0 and above.
 
 ### Framework dependencies
 
@@ -53,7 +54,7 @@ CoreTextLabel 1.0 and higher requires iOS 3.2 and above.
 
 ### ARC
 
-CoreTextLabel uses ARC as of its 1.0 release.
+CoreTextLabel uses ARC.
 
 If you are using CoreTextLabel 1.0 in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the CoreTextLabel source files.
 
@@ -61,8 +62,7 @@ To set a compiler flag in Xcode, go to your active target and select the "Build 
 
 ## Credits
 
-CoreTextLabel was created by [Daniel Kuhnke](https://github.com/dkuhnke/) for [appfarms GmbH & Co. KG](http://www.appfarms.com)
-
+CoreTextLabel was created by [Daniel Kuhnke](https://github.com/appfarms/) for [appfarms GmbH & Co. KG](http://www.appfarms.com)
 
 ## License
 
