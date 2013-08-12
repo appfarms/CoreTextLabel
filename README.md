@@ -56,7 +56,7 @@ CoreTextLabel 1.0 and higher requires iOS 5.0 and above.
 
 CoreTextLabel uses ARC.
 
-If you are using CoreTextLabel 1.0 in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the CoreTextLabel source files.
+If you are using CoreTextLabel in your non-arc project, you will need to set a `-fobjc-arc` compiler flag on all of the CoreTextLabel source files.
 
 To set a compiler flag in Xcode, go to your active target and select the "Build Phases" tab. Now select all CoreTextLabel source files, press Enter, insert `-fobjc-arc` or `-fno-objc-arc` and then "Done" to enable or disable ARC for CoreTextLabel.
 
