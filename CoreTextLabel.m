@@ -200,6 +200,9 @@
     CGPathAddRect(framePath, nil, bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
     
+    CFRelease(framePath);
+    CFRelease(framesetter);
+    
     if (!aFrame)
     {
         return calcSize;
@@ -239,7 +242,9 @@
     
     calcSize.width  = (calcWidth <= size.width)   ? calcWidth  : size.width;
     calcSize.height = (calcHeight <= size.height) ? calcHeight : size.height;
-        
+    
+    CFRelease(aFrame);
+    
     return calcSize;
 }
 
@@ -266,6 +271,8 @@
     
     if (!aFrame)
     {
+        CFRelease(framesetter);
+        CFRelease(framePath);
         return;
     }
     
@@ -342,7 +349,11 @@
         startIndex += frameRange.length;
         CFRelease(frame);
     }
+    
+    CFRelease(framesetter);
+    CFRelease(framePath);
     CFRelease(columnPaths);
+    CFRelease(aFrame);
 }
 
 - (CFArrayRef) columnPaths
@@ -440,8 +451,11 @@
                                         (__bridge id)paragraphStyle, (id)kCTParagraphStyleAttributeName,
                                         nil];
     
+    CFRelease(paragraphStyle);
+    
 	if (html == nil || [html isKindOfClass:[NSString class]] == NO)
 	{
+        CFRelease(parentFont);
 		return [[NSMutableAttributedString alloc] initWithString:@""
                                                       attributes:attributes];
 	}
@@ -465,11 +479,13 @@
 	{
 		if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
 		{
+            CFRelease(parentFont);
 			parentFont  = CTFontCreateFromUIFont(self.boldFont);
             parentColor = self.boldTextColor.CGColor;
 		}
 		if ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"])
 		{
+            CFRelease(parentFont);
 			parentFont  = CTFontCreateFromUIFont(self.italicFont);
             parentColor = self.italicTextColor.CGColor;
 		}
@@ -504,25 +520,30 @@
                 
 				CTFontRef  matchFont  = parentFont;
                 CGColorRef matchColor = parentColor;
+                CFRetain(matchFont);
                 
 				if ([searchTag isEqualToString:@"b"] || [searchTag isEqualToString:@"strong"])
 				{
+                    CFRelease(matchFont);
 					matchFont  = CTFontCreateFromUIFont(self.boldFont);
                     matchColor = self.boldTextColor.CGColor;
                     
 					if (parentTag && ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"]))
 					{
+                        CFRelease(matchFont);
 						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
                         matchColor = self.boldItalicTextColor.CGColor;
 					}
 				}
 				if ([searchTag isEqualToString:@"i"] || [searchTag isEqualToString:@"em"])
 				{
+                    CFRelease(matchFont);
 					matchFont  = CTFontCreateFromUIFont(self.italicFont);
                     matchColor = self.italicTextColor.CGColor;
                     
 					if (parentTag && ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"]))
 					{
+                        CFRelease(matchFont);
 						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
                         matchColor = self.boldItalicTextColor.CGColor;
 					}
@@ -549,6 +570,8 @@
                 
 				[attrString replaceCharactersInRange:match
                                 withAttributedString:innerAttrString];
+                
+                CFRelease(matchFont);
 			}
 			else
             {
@@ -563,8 +586,12 @@
     
 	NSRange newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
     
-    [attributes setValue:(__bridge id)(CTFontCreateFromUIFont(self.font))
+    CTFontRef attrFont = CTFontCreateFromUIFont(self.font);
+    
+    [attributes setValue:(__bridge id)(attrFont)
                   forKey:(id)kCTFontAttributeName];
+    
+    CFRelease(attrFont);
     
 	do
 	{
@@ -578,6 +605,8 @@
 		
 	}
 	while (newLinePlaceholder.location != NSNotFound);
+    
+    CFRelease(parentFont);
     
 	return attrString;
 }
