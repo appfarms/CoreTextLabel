@@ -96,6 +96,14 @@
     _textAlignment       = NSTextAlignmentLeft;
 }
 
+#pragma mark - Setter
+
+- (void) setString:(NSMutableAttributedString *)string
+{
+    _string = string;
+    [self setNeedsDisplay];
+}
+
 #pragma mark - Getter
 
 - (UIFont *) font

@@ -63,9 +63,9 @@
         _label.numberOfColumns     = 3;
         _label.columnMargin        = 10.f;
         
-        _label.string              = [_label attributedStringByHTML:[self html]];
-        
         [self.view addSubview:_label];
+        
+        _label.string              = [_label attributedStringByHTML:[self html]];
     }
 }
 
