@@ -199,6 +199,12 @@
 - (CGSize) sizeThatFits:(CGSize)size
 {
     CGSize calcSize = CGSizeZero;
+    
+    if (self.string == nil || [self.string isKindOfClass:[NSMutableAttributedString class]] == NO || self.string.length == 0)
+    {
+        return calcSize;
+    }
+    
     CGRect bounds   = CGRectMake(0.f, 0.f, size.width, size.height);
     
     CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
@@ -260,7 +266,10 @@
 {
     [super drawRect:rect];
     
-    //NSLog(@"drawRect rect => %@", NSStringFromCGRect(rect));
+    if (self.string == nil || [self.string isKindOfClass:[NSMutableAttributedString class]] == NO || self.string.length == 0)
+    {
+        return;
+    }
     
     // Fetch the context
 	CGContextRef context = UIGraphicsGetCurrentContext();
