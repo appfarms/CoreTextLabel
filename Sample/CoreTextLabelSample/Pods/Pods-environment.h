@@ -6,6 +6,12 @@
 // project.
 
 
+// AFMacros
+#define COCOAPODS_POD_AVAILABLE_AFMacros
+#define COCOAPODS_VERSION_MAJOR_AFMacros 1
+#define COCOAPODS_VERSION_MINOR_AFMacros 1
+#define COCOAPODS_VERSION_PATCH_AFMacros 0
+
 // RegexKitLite
 #define COCOAPODS_POD_AVAILABLE_RegexKitLite
 #define COCOAPODS_VERSION_MAJOR_RegexKitLite 4

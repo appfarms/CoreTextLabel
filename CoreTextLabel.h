@@ -30,7 +30,6 @@
  */
 @property (nonatomic, retain) NSMutableAttributedString * string;
 
-
 /**
  Regular font used to create NSMutableAttributedString with -attributedStringByHTML:
  
@@ -60,6 +59,13 @@
 @property (nonatomic, retain) UIFont * boldItalicFont;
 
 /**
+ Font for HTML-links used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default [UIFont systemFontOfSize:]
+ */
+@property (nonatomic, retain) UIFont * linkFont;
+
+/**
  Text color used to create NSMutableAttributedString with -attributedStringByHTML:
  
  @default [UIColor blackColor]
@@ -86,6 +92,13 @@
  @default self.textColor
  */
 @property (nonatomic, retain) UIColor * boldItalicTextColor;
+
+/**
+ Text color for HTML-Links used to create NSMutableAttributedString with -attributedStringByHTML:
+ 
+ @default self.textColor
+ */
+@property (nonatomic, retain) UIColor * linkTextColor;
 
 /**
  Font size used to create NSMutableAttributedString with -attributedStringByHTML: if used with default fonts
@@ -135,14 +148,24 @@
 @property (nonatomic, readonly) BOOL textIsTruncated;
 
 /**
- * Create NSMutableAttributedString by HTML string
- *
- * - text will be styled with self.font and self.textColor
- * - </p> and <br /> will be replaced by NEWLINE
- * - <b> and <strong> will be styled with self.boldFont and self.boldTextColor
- * - <i> and <em> will be styled with self.italicFont and self.italicTextColor
- * - <i>/<em> combined with <b>/<strong> will be styled with self.boldItalicFont and self.boldItalicTextColor
+ Create NSMutableAttributedString by HTML string
+ 
+ - text will be styled with self.font and self.textColor
+ - </p> and <br /> will be replaced by NEWLINE
+ - <b> and <strong> will be styled with self.boldFont and self.boldTextColor
+ - <i> and <em> will be styled with self.italicFont and self.italicTextColor
+ - <i>/<em> combined with <b>/<strong> will be styled with self.boldItalicFont and self.boldItalicTextColor
  */
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html;
+
+/**
+ Add an URL to given range. On user tap `linkPressedBlock` will be called
+ */
+- (void) addLink:(NSURL*)url atRange:(NSRange)range;
+
+/**
+ Assign a block to be called when label get's tapped on text with assigned URL
+ */
+- (void) setLinkPressedBlock:(void (^)(NSTextCheckingResult * textCheckingResult))linkPressedBlock;
 
 @end

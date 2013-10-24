@@ -1,10 +1,13 @@
 PODS:
+  - AFMacros (1.1)
   - RegexKitLite (4.0)
 
 DEPENDENCIES:
+  - AFMacros
   - RegexKitLite (= 4.0)
 
 SPEC CHECKSUMS:
+  AFMacros: 7bbcb769c8a0d873ad5a0b6333632cb4eede44cc
   RegexKitLite: f7af7b4d2b675cd2ec9a4abab6aad6ae1f6499c0
 
-COCOAPODS: 0.25.0
+COCOAPODS: 0.26.2

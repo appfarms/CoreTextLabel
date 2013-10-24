@@ -25,14 +25,21 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
-
+#import "AFMacros.h"
 #import "RegexKitLite.h"
 
 #define CORE_TEXT_SUPPORTED() ([[[UIDevice currentDevice] systemVersion] floatValue] >= 3.2)
 
+NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed";
+
 @interface CoreTextLabel()
 
-@property (nonatomic, retain) CATextLayer * attributedTextLayer;
+@property (nonatomic, retain) CATextLayer               * attributedTextLayer;
+@property (nonatomic, assign) CTFramesetterRef            framesetter;
+@property (nonatomic, retain) NSMutableAttributedString * framesetterString;
+@property (nonatomic, retain) NSMutableArray            * linkArray;
+@property (nonatomic, retain) NSMutableDictionary       * blocks;
+@property (nonatomic, retain) NSTextCheckingResult      * activeLink;
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag;
 
@@ -83,8 +90,19 @@
 	return self;
 }
 
+- (void) dealloc
+{
+    if (_framesetter)
+    {
+        CFRelease(_framesetter);
+        _framesetter = nil;
+    }
+}
+
 - (void) setupInitDefaults
 {
+    self.linkArray = [NSMutableArray array];
+    
     // Force redraw on layout or frame changes
     [self setContentMode:UIViewContentModeRedraw];
     
@@ -103,6 +121,19 @@
 {
     _string = string;
     [self setNeedsDisplay];
+}
+
+- (void) setLinkPressedBlock:(void (^)(NSTextCheckingResult * textCheckingResult))linkPressedBlock
+{
+    if (linkPressedBlock)
+    {
+        if (AF_VALID(self.blocks, NSMutableDictionary) == NO)
+        {
+            self.blocks = [NSMutableDictionary dictionary];
+        }
+        
+        self.blocks[CoreTextLabelBlockKeyLinkPressed] = [linkPressedBlock copy];
+    }
 }
 
 #pragma mark - Getter
@@ -147,6 +178,16 @@
     return _boldItalicFont;
 }
 
+- (UIFont *) linkFont
+{
+    if (!_linkFont)
+    {
+        self.linkFont = [UIFont systemFontOfSize:self.defaultFontSize];
+    }
+    
+    return _linkFont;
+}
+
 - (UIColor *) textColor
 {
     if (!_textColor)
@@ -188,6 +229,143 @@
     return _boldItalicTextColor;
 }
 
+- (UIColor *) linkTextColor
+{
+    if (!_linkTextColor)
+    {
+        self.linkTextColor = self.textColor;
+    }
+    
+    return _linkTextColor;
+}
+
+- (CTFramesetterRef) framesetter
+{
+    BOOL stringIsDifferent = (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == YES && AF_VALID_NOTEMPTY(self.framesetterString, NSMutableAttributedString) == YES && [self.string isEqualToAttributedString:self.framesetterString] == YES);
+    
+    if (!_framesetter || stringIsDifferent == YES)
+    {
+        if (AF_VALID(self.string, NSMutableAttributedString))
+        {
+            if (stringIsDifferent && _framesetter)
+            {
+                CFRelease(_framesetter);
+                _framesetter = nil;
+                
+                [self.linkArray removeAllObjects];
+            }
+            
+            _framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+        }
+    }
+    
+    return _framesetter;
+}
+
+//
+// Method `linkAtCharacterIndex:` is original from TTTAttributedLabel.m
+// Copyright (c) 2011 Mattt Thompson (http://mattt.me)
+// https://github.com/mattt/TTTAttributedLabel
+//
+- (NSTextCheckingResult *) linkAtCharacterIndex:(CFIndex)idx
+{
+    NSEnumerator *enumerator = [self.linkArray reverseObjectEnumerator];
+    NSTextCheckingResult *result = nil;
+    
+    while ((result = [enumerator nextObject]))
+    {
+        if (NSLocationInRange((NSUInteger)idx, result.range))
+        {
+            return result;
+        }
+    }
+    
+    return nil;
+}
+
+//
+// Method `characterIndexAtPoint:` is original from TTTAttributedLabel.m
+// Copyright (c) 2011 Mattt Thompson (http://mattt.me)
+// https://github.com/mattt/TTTAttributedLabel
+//
+- (CFIndex) characterIndexAtPoint:(CGPoint)point
+{
+    if (!CGRectContainsPoint(self.bounds, point))
+    {
+        return NSNotFound;
+    }
+    
+    CGRect textRect = CGRectZero;
+    textRect.size   = [self sizeThatFits:CGSizeMake(self.frame.size.width, self.frame.size.height)];
+    
+    if (!CGRectContainsPoint(textRect, point))
+    {
+        return NSNotFound;
+    }
+    
+    // Offset tap coordinates by textRect origin to make them relative to the origin of frame
+    point = CGPointMake(point.x - textRect.origin.x, point.y - textRect.origin.y);
+    // Convert tap coordinates (start at top left) to CT coordinates (start at bottom left)
+    point = CGPointMake(point.x, textRect.size.height - point.y);
+    
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathAddRect(path, NULL, textRect);
+    CTFrameRef frame = CTFramesetterCreateFrame(self.framesetter, CFRangeMake(0, self.string.length), path, NULL);
+    if (frame == NULL) {
+        CFRelease(path);
+        return NSNotFound;
+    }
+    
+    CFArrayRef lines = CTFrameGetLines(frame);
+    NSInteger numberOfLines = self.numberOfLines > 0 ? MIN(self.numberOfLines, CFArrayGetCount(lines)) : CFArrayGetCount(lines);
+    if (numberOfLines == 0) {
+        CFRelease(frame);
+        CFRelease(path);
+        return NSNotFound;
+    }
+    
+    NSUInteger idx = NSNotFound;
+    
+    CGPoint lineOrigins[numberOfLines];
+    CTFrameGetLineOrigins(frame, CFRangeMake(0, numberOfLines), lineOrigins);
+    
+    for (CFIndex lineIndex = 0; lineIndex < numberOfLines; lineIndex++)
+    {
+        CGPoint lineOrigin = lineOrigins[lineIndex];
+        CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
+        
+        // Get bounding information of line
+        CGFloat ascent = 0.0f, descent = 0.0f, leading = 0.0f;
+        CGFloat width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
+        CGFloat yMin = floor(lineOrigin.y - descent);
+        CGFloat yMax = ceil(lineOrigin.y + ascent);
+        
+        // Check if we've already passed the line
+        if (point.y > yMax)
+        {
+            break;
+        }
+        
+        // Check if the point is within this line vertically
+        if (point.y >= yMin)
+        {
+            // Check if the point is within this line horizontally
+            if (point.x >= lineOrigin.x && point.x <= lineOrigin.x + width)
+            {
+                // Convert CT coordinates to line-relative coordinates
+                CGPoint relativePoint = CGPointMake(point.x - lineOrigin.x, point.y - lineOrigin.y);
+                idx = CTLineGetStringIndexForPosition(line, relativePoint);
+                break;
+            }
+        }
+    }
+    
+    CFRelease(frame);
+    CFRelease(path);
+    
+    return idx;
+}
+
 #pragma mark - Layout
 
 - (void) sizeToFit
@@ -201,22 +379,20 @@
 {
     CGSize calcSize = CGSizeZero;
     
-    if (self.string == nil || [self.string isKindOfClass:[NSMutableAttributedString class]] == NO || self.string.length == 0)
+    if (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == NO)
     {
         return calcSize;
     }
     
     CGRect bounds   = CGRectMake(0.f, 0.f, size.width, size.height);
     
-    CTFramesetterRef framesetter     = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
     CFRange          fullStringRange = CFRangeMake(0, self.string.length);
     
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, bounds);
-    CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    CTFrameRef aFrame = CTFramesetterCreateFrame(self.framesetter, fullStringRange, framePath, NULL);
     
     CFRelease(framePath);
-    CFRelease(framesetter);
     
     if (!aFrame)
     {
@@ -282,16 +458,14 @@
 	CGContextTranslateCTM(context, 0, self.bounds.size.height);
 	CGContextScaleCTM(context, 1.0, -1.0);
     
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
     CFRange fullStringRange = CFRangeMake(0, self.string.length);
     
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, rect);
-    CTFrameRef aFrame = CTFramesetterCreateFrame(framesetter, fullStringRange, framePath, NULL);
+    CTFrameRef aFrame = CTFramesetterCreateFrame(self.framesetter, fullStringRange, framePath, NULL);
     
     if (!aFrame)
     {
-        CFRelease(framesetter);
         CFRelease(framePath);
         return;
     }
@@ -309,7 +483,7 @@
         CGPathRef path = (CGPathRef)CFArrayGetValueAtIndex(columnPaths, column);
         
         // Create a frame for this column and draw it.
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(startIndex, 0), path, NULL);
+        CTFrameRef frame = CTFramesetterCreateFrame(self.framesetter, CFRangeMake(startIndex, 0), path, NULL);
         
         CFArrayRef lines = CTFrameGetLines(frame);
         CFIndex    count = CFArrayGetCount(lines);
@@ -372,7 +546,6 @@
         CFRelease(frame);
     }
     
-    CFRelease(framesetter);
     CFRelease(framePath);
     CFRelease(columnPaths);
     CFRelease(aFrame);
@@ -432,15 +605,82 @@
     return array;
 }
 
+#pragma mark - UIResponder / Link handling
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    CGPoint point   = [[touches anyObject] locationInView:self];
+    CFIndex idx     = [self characterIndexAtPoint:point];
+    self.activeLink = [self linkAtCharacterIndex:idx];
+
+    if (!self.activeLink)
+    {
+        [super touchesBegan:touches withEvent:event];
+    }
+}
+
+- (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (self.activeLink)
+    {
+        CGPoint point   = [[touches anyObject] locationInView:self];
+        CFIndex idx     = [self characterIndexAtPoint:point];
+
+        if ([self.activeLink isEqual:[self linkAtCharacterIndex:idx]] == NO)
+        {
+            self.activeLink = nil;
+        }
+    }
+    else
+    {
+        [super touchesMoved:touches withEvent:event];
+    }
+}
+
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (AF_VALID(self.activeLink, NSTextCheckingResult) && self.blocks[CoreTextLabelBlockKeyLinkPressed])
+    {
+        void (^block)(NSTextCheckingResult * textCheckingResult);
+        block = self.blocks[CoreTextLabelBlockKeyLinkPressed];
+        if (block)
+        {
+            block(self.activeLink);
+        }
+    }
+}
+
+- (void) addLink:(NSURL*)url atRange:(NSRange)range
+{
+    [self addLink:url atRange:range inString:self.string];
+    [self setNeedsDisplay];
+}
+
+- (void) addLink:(NSURL *)url atRange:(NSRange)range inString:(NSMutableAttributedString *)string
+{
+    if (AF_VALID_NOTEMPTY(string, NSMutableAttributedString) &&
+        AF_VALID(url, NSURL) && NSLocationInRange(range.location, NSMakeRange(0, string.length)) &&
+        (range.location+range.length) <= string.length)
+    {
+        NSTextCheckingResult * textCheckingResult = [NSTextCheckingResult linkCheckingResultWithRange:range URL:url];
+        
+        [string addAttributes:@{ (id)kCTForegroundColorAttributeName : (__bridge id)self.linkTextColor.CGColor, (id)kCTFontAttributeName : (__bridge id)CTFontCreateFromUIFont(self.linkFont) }
+                        range:textCheckingResult.range];
+        
+        [self.linkArray addObject:textCheckingResult];
+    }
+}
+
 #pragma mark - HTML
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html
 {
-	return [self attributedStringByHTML:html parentTag:nil];
+    return [self attributedStringByHTML:html parentTag:nil];
 }
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag
 {
+    NSString * urlString   = nil;
 	CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
     CGColorRef parentColor = self.textColor.CGColor;
     
@@ -481,18 +721,18 @@
 		return [[NSMutableAttributedString alloc] initWithString:@""
                                                       attributes:attributes];
 	}
-
+    
+    // Fix newlines
+	NSString * newLinePlaceHolder = @"{BR}";
+    html = [html stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+	html = [html stringByReplacingOccurrencesOfRegex:@"<p[^>]*>" withString:@""];
+	html = [html stringByReplacingOccurrencesOfString:@"</p>" withString:newLinePlaceHolder];
+	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
+    
     // Remove "self closing" tags
     html = [html stringByReplacingOccurrencesOfRegex:@"(<[a-zA-Z]+)([^>]+)(/>)"
                                           withString:@""];
     
-	NSString * newLinePlaceHolder = @"{BR}";
-    
-	// Fix newlines
-	html = [html stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-	html = [html stringByReplacingOccurrencesOfRegex:@"<p[^>]*>" withString:@""];
-	html = [html stringByReplacingOccurrencesOfString:@"</p>" withString:newLinePlaceHolder];
-	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
     
 	NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
                                                                                     attributes:attributes];
@@ -511,6 +751,12 @@
 			parentFont  = CTFontCreateFromUIFont(self.italicFont);
             parentColor = self.italicTextColor.CGColor;
 		}
+		if ([parentTag isEqualToString:@"a"])
+		{
+            CFRelease(parentFont);
+			parentFont  = CTFontCreateFromUIFont(self.linkFont);
+            parentColor = self.linkTextColor.CGColor;
+		}
 	}
     
 	NSRange tagRange = [attrString.string rangeOfRegex:@"<[^/>]+>"];
@@ -527,6 +773,11 @@
 			// Remove attributes from tag
 			if ([searchTag rangeOfRegex:@" "].location != NSNotFound)
 			{
+                if ([searchTag rangeOfString:@"href="].location != NSNotFound)
+                {
+                    urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+)(\\\")(.*)" withString:@"$3"];
+                }
+                
 				NSInteger location = [searchTag rangeOfRegex:@" "].location;
 				searchTag          = [searchTag stringByReplacingCharactersInRange:NSMakeRange(location, [searchTag length]-location) withString:@""];
 			}
@@ -592,6 +843,15 @@
                 
 				[attrString replaceCharactersInRange:match
                                 withAttributedString:innerAttrString];
+                
+                if (AF_VALID_NOTEMPTY(urlString, NSString))
+                {
+                    [self addLink:[NSURL URLWithString:urlString]
+                          atRange:NSMakeRange(match.location, innerAttrString.length)
+                         inString:attrString];
+                    urlString = nil;
+                }
+                
                 
                 CFRelease(matchFont);
 			}
