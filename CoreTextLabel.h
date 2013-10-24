@@ -127,6 +127,12 @@
  */
 @property (nonatomic, assign) NSTextAlignment textAlignment;
 
+/**
+ Text is displayed truncated
+ 
+ @default NO
+ */
+@property (nonatomic, readonly) BOOL textIsTruncated;
 
 /**
  * Create NSMutableAttributedString by HTML string

@@ -94,6 +94,7 @@
     _defaultFontSize     = 18.f;
     _lineSpacing         = 0.f;
     _textAlignment       = NSTextAlignmentLeft;
+    _textIsTruncated     = NO;
 }
 
 #pragma mark - Setter
@@ -225,9 +226,11 @@
     CFArrayRef lines = CTFrameGetLines(aFrame);
     CFIndex    count = CFArrayGetCount(lines);
     
+    _textIsTruncated = NO;
     // Limit lines if self.numberOfLines != 0
     if (self.numberOfLines != 0 && count > self.numberOfLines)
     {
+        _textIsTruncated = YES;
         count = self.numberOfLines;
     }
     
@@ -359,6 +362,8 @@
             CGContextSetTextPosition(context, lastOrigin.x+columnFrame.origin.x, lastOrigin.y);
             CTLineDraw(truncated, context);
             CFRelease(truncated);
+            
+            _textIsTruncated = YES;
         }
         
         // Start the next frame at the first character not visible in this frame.
@@ -593,6 +598,8 @@
 			else
             {
 				NSLog(@"NOT found: regString:%@ match(%i,%i) %@", regString, match.location, match.length, attrString.string);
+                tagRange = NSMakeRange(NSNotFound, 0);
+                continue;
 			}
             
 			tagRange = [attrString.string rangeOfRegex:@"<[^>]+>"];
