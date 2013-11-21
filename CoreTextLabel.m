@@ -723,16 +723,19 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 	}
     
     // Fix newlines
-	NSString * newLinePlaceHolder = @"{BR}";
+	NSString * newLinePlaceHolder       = @"{BR}";
+	NSString * doubleNewLinePlaceHolder = [NSString stringWithFormat:@"%@%@", newLinePlaceHolder, newLinePlaceHolder];
+    
     html = [html stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-	html = [html stringByReplacingOccurrencesOfRegex:@"<p[^>]*>" withString:@""];
-	html = [html stringByReplacingOccurrencesOfString:@"</p>" withString:newLinePlaceHolder];
+	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>$" withString:@""];
+    html = [html stringByReplacingOccurrencesOfRegex:@"(</(p|div)>)([\\s]*)(<(p|div)[^>]*>)" withString:doubleNewLinePlaceHolder];
+	html = [html stringByReplacingOccurrencesOfRegex:@"<(p|div)[^>]*>" withString:doubleNewLinePlaceHolder];
+	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>" withString:doubleNewLinePlaceHolder];
 	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
     
     // Remove "self closing" tags
     html = [html stringByReplacingOccurrencesOfRegex:@"(<[a-zA-Z]+)([^>]+)(/>)"
                                           withString:@""];
-    
     
 	NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
                                                                                     attributes:attributes];
