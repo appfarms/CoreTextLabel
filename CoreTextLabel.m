@@ -674,7 +674,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 #pragma mark - HTML
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html
-{
+{    
     return [self attributedStringByHTML:html parentTag:nil];
 }
 
@@ -762,7 +762,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 		}
 	}
     
-	NSRange tagRange = [attrString.string rangeOfRegex:@"<[^/>]+>"];
+	NSRange tagRange = [attrString.string rangeOfRegex:@"(<)([^>]+)(/>|>)"];
     
 	do
 	{
