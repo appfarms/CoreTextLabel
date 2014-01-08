@@ -35,20 +35,20 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     self.view.backgroundColor = [UIColor lightGrayColor];
-    
+
     if (!_label)
     {
         UIFont   * regularFont         = [UIFont fontWithName:@"Verdana" size:18];
         UIFont   * boldFont            = [UIFont fontWithName:@"Verdana-Bold" size:18];
         UIFont   * italicFont          = [UIFont fontWithName:@"Verdana-Italic" size:18];
         UIFont   * boldItalicFont      = [UIFont fontWithName:@"Verdana-BoldItalic" size:18];
-        
+
         UIColor  * boldTextColor       = [UIColor blueColor];
         UIColor  * boldItalicTextColor = [UIColor redColor];
         UIColor  * italicTextColor     = [UIColor yellowColor];
-        
+
         _label                     = [[CoreTextLabel alloc] initWithFrame:[self labelFrame]];
         _label.defaultFontSize     = 18;
         _label.font                = regularFont;
@@ -59,16 +59,13 @@
         _label.boldItalicTextColor = boldItalicTextColor;
         _label.italicTextColor     = italicTextColor;
         _label.linkTextColor       = [UIColor purpleColor];
-        _label.string              = [_label attributedStringByHTML:[self html]];
-        
-//        [_label addLink:[NSURL URLWithString:@"adsadasdasdasdd"]
-//                atRange:NSMakeRange(20, 100)];
-        
+        _label.html                = [self html];
+
         [_label setLinkPressedBlock:^(NSTextCheckingResult *textCheckingResult) {
             NSLog(@"textCheckingResult => %@", textCheckingResult);
         }];
-        
-        
+
+
         [self.view addSubview:_label];
     }
 }

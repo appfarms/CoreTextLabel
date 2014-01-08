@@ -1,14 +1,13 @@
-CoreTextLabel
-=============
+# CoreTextLabel
 
 With CoreTextLabel you are able draw NSAttributedString or HTML with custom font and color in iOS (>= 5.0) applications. 
-"numberOfLines" and "truncation" (NSLineBreakByTruncatingTail) is also supported.
+**numberOfLines** and **truncation** (*NSLineBreakByTruncatingTail*) is also supported.
 
 ## Example
 
 ``` objective-c
     CoreTextLabel * label  = [[CoreTextLabel alloc] initWithFrame:frame];
-    label.string           = [label attributedStringByHTML:htmlString];
+    label.html             = htmlString;
     [label sizeToFit];
     [self.view addSubview:label];
 ```
