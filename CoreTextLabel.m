@@ -66,18 +66,6 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 @synthesize columnMargin        = _columnMargin;
 @synthesize textAlignment       = _textAlignment;
 
-- (id) initWithFrame:(CGRect)frame
-{
-	self = [super initWithFrame:frame];
-    
-	if (self)
-	{
-        [self setupInitDefaults];
-	}
-    
-	return self;
-}
-
 - (id) init
 {
 	self = [super init];
@@ -90,13 +78,28 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 	return self;
 }
 
-- (void) dealloc
+- (id) initWithFrame:(CGRect)frame
 {
-    if (_framesetter)
+	self = [super initWithFrame:frame];
+    
+	if (self)
+	{
+        [self setupInitDefaults];
+	}
+    
+	return self;
+}
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    
+    if (self)
     {
-        CFRelease(_framesetter);
-        _framesetter = nil;
+        [self setupInitDefaults];
     }
+    
+    return self;
 }
 
 - (void) setupInitDefaults
@@ -113,6 +116,15 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     _lineSpacing         = 0.f;
     _textAlignment       = NSTextAlignmentLeft;
     _textIsTruncated     = NO;
+}
+
+- (void) dealloc
+{
+    if (_framesetter)
+    {
+        CFRelease(_framesetter);
+        _framesetter = nil;
+    }
 }
 
 #pragma mark - Setter
@@ -790,8 +802,8 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>" withString:doubleNewLinePlaceHolder];
 	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
     
-    // Remove "self closing" tags
-    html = [html stringByReplacingOccurrencesOfRegex:@"(<[a-zA-Z]+)([^>]+)(/>)"
+    // Remove other unsupported tags
+    html = [html stringByReplacingOccurrencesOfRegex:@"</?(?!a|b|i|em|strong)\\w+[^>]*>"
                                           withString:@""];
     
 	NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
