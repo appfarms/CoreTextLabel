@@ -1,3 +1,4 @@
 platform :ios, '5.0'
 pod 'RegexKitLite', '4.0'
 pod 'AFMacros'
+pod 'NSString-HTML'

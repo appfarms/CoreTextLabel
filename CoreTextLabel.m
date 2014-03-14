@@ -25,8 +25,9 @@
 
 #import <QuartzCore/QuartzCore.h>
 #import <CoreText/CoreText.h>
-#import "AFMacros.h"
-#import "RegexKitLite.h"
+#import <AFMacros/AFMacros.h>
+#import <RegexKitLite/RegexKitLite.h>
+#import <NSString-HTML/NSString+HTML.h>
 
 #define CORE_TEXT_SUPPORTED() ([[[UIDevice currentDevice] systemVersion] floatValue] >= 3.2)
 
@@ -740,7 +741,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html
 {
-    return [self attributedStringByHTML:html parentTag:nil];
+    return [self attributedStringByHTML:[html kv_decodeHTMLCharacterEntities] parentTag:nil];
 }
 
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag
