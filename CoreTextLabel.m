@@ -793,15 +793,27 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 	NSString * doubleNewLinePlaceHolder = [NSString stringWithFormat:@"%@%@", newLinePlaceHolder, newLinePlaceHolder];
     
     // Replace newlines and global starting or ending p- and div-tags with empty string
-    html = [html stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-	html = [html stringByReplacingOccurrencesOfRegex:@"^<(p|div)[^>]*>" withString:@""];
-	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>$" withString:@""];
+    html = [html stringByReplacingOccurrencesOfRegex:@"[\\s]+"
+                                          withString:@" "];
+
+	html = [html stringByReplacingOccurrencesOfRegex:@"^<(p|div)[^>]*>"
+                                          withString:@""];
+
+	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>$"
+                                          withString:@""];
     
     // Replace tags with newline placeholder
-    html = [html stringByReplacingOccurrencesOfRegex:@"(</(p|div)>)([\\s]*)(<(p|div)[^>]*>)" withString:doubleNewLinePlaceHolder];
-    html = [html stringByReplacingOccurrencesOfRegex:@"<(p|div)[^>]*>" withString:doubleNewLinePlaceHolder];
-	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>" withString:doubleNewLinePlaceHolder];
-	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>" withString:newLinePlaceHolder];
+    html = [html stringByReplacingOccurrencesOfRegex:@"(</(p|div)>)([\\s]*)(<(p|div)[^>]*>)"
+                                          withString:doubleNewLinePlaceHolder];
+
+    html = [html stringByReplacingOccurrencesOfRegex:@"<(p|div)[^>]*>"
+                                          withString:doubleNewLinePlaceHolder];
+
+	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>"
+                                          withString:doubleNewLinePlaceHolder];
+
+	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>"
+                                          withString:newLinePlaceHolder];
     
     // Remove other unsupported tags
     html = [html stringByReplacingOccurrencesOfRegex:@"</?(?!a|b|i|em|strong)\\w+[^>]*>"
@@ -831,7 +843,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
         
 	}
 	while (newLinePlaceholder.location != NSNotFound);
-    
+
 	if (parentTag)
 	{
 		if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
@@ -870,7 +882,8 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 			{
                 if ([searchTag rangeOfString:@"href="].location != NSNotFound)
                 {
-                    urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+)(\\\")(.*)" withString:@"$3"];
+                    urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+)(\\\")(.*)"
+                                                                    withString:@"$3"];
                 }
                 
 				NSInteger location = [searchTag rangeOfRegex:@" "].location;
@@ -878,13 +891,21 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 			}
             
 			NSString * regString = [NSString stringWithFormat:@"<%@[^>]*>(.*?)</%@>", searchTag, searchTag];
-			NSRange    match     = [attrString.string rangeOfRegex:regString];
+			NSRange    match     = [attrString.string rangeOfRegex:regString
+                                                           options:RKLDotAll|RKLMultiline
+                                                           inRange:NSMakeRange(0, attrString.string.length)
+                                                           capture:0
+                                                             error:nil];
             
 			if (match.location != NSNotFound)
 			{
 				NSString * innerString = [attrString.string substringWithRange:match];
-				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag] withString:@""];
-				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag] withString:@""];
+
+				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag]
+                                                                               withString:@""];
+
+				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag]
+                                                                               withString:@""];
                 
 				CTFontRef  matchFont  = parentFont;
                 CGColorRef matchColor = parentColor;
