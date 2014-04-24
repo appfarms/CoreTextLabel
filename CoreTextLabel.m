@@ -267,7 +267,9 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (CTFramesetterRef) framesetter
 {
-    BOOL stringIsDifferent = (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == YES && AF_VALID_NOTEMPTY(self.framesetterString, NSMutableAttributedString) == YES && [self.string isEqualToAttributedString:self.framesetterString] == YES);
+    BOOL stringIsDifferent = (AF_VALID(self.string, NSMutableAttributedString) == YES &&
+                              AF_VALID(self.framesetterString, NSMutableAttributedString) == YES &&
+                              [self.string isEqualToAttributedString:self.framesetterString] == NO);
     
     if (!_framesetter || stringIsDifferent == YES)
     {
@@ -280,8 +282,9 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
                 
                 [self.linkArray removeAllObjects];
             }
-            
-            _framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+
+            _framesetterString = [self.string mutableCopy];
+            _framesetter       = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
         }
     }
     
