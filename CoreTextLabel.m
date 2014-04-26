@@ -885,7 +885,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 			{
                 if ([searchTag rangeOfString:@"href="].location != NSNotFound)
                 {
-                    urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+)(\\\")(.*)"
+                    urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+?)(\\\")(.*)"
                                                                     withString:@"$3"];
                 }
                 
