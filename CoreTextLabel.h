@@ -3,7 +3,7 @@
 //  CoreTextLabel
 //
 //  Created by Daniel Kuhnke on 19.11.12.
-//  Copyright (c) 2012 Daniel Kuhnke appfarms GmbH & Co. KG (http://www.appfarms.com/)
+//  Copyright (c) 2014 Daniel Kuhnke appfarms GmbH & Co. KG (http://www.appfarms.com/)
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 //  and associated documentation files (the "Software"), to deal in the Software without restriction,
