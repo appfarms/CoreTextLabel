@@ -279,8 +279,6 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             {
                 CFRelease(_framesetter);
                 _framesetter = nil;
-                
-                [self.linkArray removeAllObjects];
             }
 
             _framesetterString = [self.string mutableCopy];
