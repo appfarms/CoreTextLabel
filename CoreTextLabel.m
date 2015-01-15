@@ -281,8 +281,11 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
                 _framesetter = nil;
             }
 
-            _framesetterString = [self.string mutableCopy];
-            _framesetter       = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+            if (self.string)
+            {
+                _framesetterString = [self.string mutableCopy];
+                _framesetter       = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.string);
+            }
         }
     }
     
@@ -317,19 +320,13 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 //
 - (CFIndex) characterIndexAtPoint:(CGPoint)point
 {
-    if (!CGRectContainsPoint(self.bounds, point))
-    {
-        return NSNotFound;
-    }
-    
-    CGRect textRect = CGRectZero;
-    textRect.size   = [self sizeThatFits:CGSizeMake(self.frame.size.width, self.frame.size.height)];
-    
+    CGRect textRect = self.bounds;
+
     if (!CGRectContainsPoint(textRect, point))
     {
         return NSNotFound;
     }
-    
+
     // Offset tap coordinates by textRect origin to make them relative to the origin of frame
     point = CGPointMake(point.x - textRect.origin.x, point.y - textRect.origin.y);
     // Convert tap coordinates (start at top left) to CT coordinates (start at bottom left)
@@ -406,16 +403,15 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 {
     CGSize calcSize = CGSizeZero;
     
-    if (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == NO)
+    if (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == NO || self.string.length == 0 || CGSizeEqualToSize(size, CGSizeZero) || !self.framesetter)
     {
         return calcSize;
     }
-    
-    CGRect bounds   = CGRectMake(0.f, 0.f, size.width, size.height);
-    
+
+    CGRect           bounds          = CGRectMake(0.f, 0.f, size.width, size.height);
     CFRange          fullStringRange = CFRangeMake(0, self.string.length);
-    
-    CGMutablePathRef framePath = CGPathCreateMutable();
+    CGMutablePathRef framePath       = CGPathCreateMutable();
+
     CGPathAddRect(framePath, nil, bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(self.framesetter, fullStringRange, framePath, NULL);
     
@@ -556,13 +552,18 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             CFRelease(truncationToken);
             
             // If 'truncated' is NULL, then no truncation was required to fit it
-            if (truncated == NULL)
+            if (truncated == NULL && lastLine)
+            {
                 truncated = (CTLineRef)CFRetain(lastLine);
-            
+            }
+
             // Draw new line at the same offset as the non-truncated version
-            CGContextSetTextPosition(context, lastOrigin.x+columnFrame.origin.x, lastOrigin.y);
-            CTLineDraw(truncated, context);
-            CFRelease(truncated);
+            if (truncated)
+            {
+                CGContextSetTextPosition(context, lastOrigin.x+columnFrame.origin.x, lastOrigin.y);
+                CTLineDraw(truncated, context);
+                CFRelease(truncated);
+            }
             
             _textIsTruncated = YES;
         }
@@ -687,14 +688,23 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 {
     if (AF_VALID_NOTEMPTY(string, NSMutableAttributedString) &&
         AF_VALID(url, NSURL) && NSLocationInRange(range.location, NSMakeRange(0, string.length)) &&
-        (range.location+range.length) <= string.length)
+        (range.location+range.length) <= string.length &&
+        AF_VALID(self.linkFont, UIFont) &&
+        AF_VALID(self.linkTextColor, UIColor))
     {
         NSTextCheckingResult * textCheckingResult = [NSTextCheckingResult linkCheckingResultWithRange:range URL:url];
-        
-        [string addAttributes:@{ (id)kCTForegroundColorAttributeName : (__bridge id)self.linkTextColor.CGColor, (id)kCTFontAttributeName : (__bridge id)CTFontCreateFromUIFont(self.linkFont) }
-                        range:textCheckingResult.range];
-        
-        [self.linkArray addObject:textCheckingResult];
+
+        if (AF_VALID(textCheckingResult, NSTextCheckingResult))
+        {
+            CTFontRef font = CTFontCreateFromUIFont(self.linkFont);
+
+            [string addAttributes:@{ (id)kCTForegroundColorAttributeName : (__bridge id)self.linkTextColor.CGColor, (id)kCTFontAttributeName : (__bridge id)font }
+                            range:textCheckingResult.range];
+
+            CFRelease(font);
+
+            [self.linkArray addObject:textCheckingResult];
+        }
     }
 }
 
