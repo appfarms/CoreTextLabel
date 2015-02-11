@@ -69,50 +69,50 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (id) init
 {
-	self = [super init];
-    
-	if (self)
-	{
+    self = [super init];
+
+    if (self)
+    {
         [self setupInitDefaults];
-	}
-    
-	return self;
+    }
+
+    return self;
 }
 
 - (id) initWithFrame:(CGRect)frame
 {
-	self = [super initWithFrame:frame];
-    
-	if (self)
-	{
+    self = [super initWithFrame:frame];
+
+    if (self)
+    {
         [self setupInitDefaults];
-	}
-    
-	return self;
+    }
+
+    return self;
 }
 
 - (id) initWithCoder:(NSCoder *)aDecoder
 {
     self = [super initWithCoder:aDecoder];
-    
+
     if (self)
     {
         [self setupInitDefaults];
     }
-    
+
     return self;
 }
 
 - (void) setupInitDefaults
 {
     self.linkArray = [NSMutableArray array];
-    
+
     // Force redraw on layout or frame changes
     [self setContentMode:UIViewContentModeRedraw];
-    
+
     // Set default background color to clear
     self.backgroundColor = [UIColor clearColor];
-    
+
     _defaultFontSize     = 18.f;
     _lineSpacing         = 0.f;
     _textAlignment       = NSTextAlignmentLeft;
@@ -132,21 +132,30 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (void) setString:(NSMutableAttributedString *)string
 {
-    _string = string;
-    [self setNeedsDisplay];
+    @synchronized(_string)
+    {
+        _string = string;
+        [self setNeedsDisplay];
+    }
 }
 
 - (void) setHtml:(NSString *)html
 {
-    _html = html;
-    self.string = [self attributedStringByHTML:html];
+    @synchronized(_html)
+    {
+        _html = html;
+        [self setString:[self attributedStringByHTML:html]];
+    }
 }
 
 - (void) setText:(NSString *)text
 {
-    _text = text;
-    self.string = [[NSMutableAttributedString alloc] initWithString:text
-                                                         attributes:self.defaultAttributedStringAttributes];
+    @synchronized(_text)
+    {
+        _text = text;
+        [self setString: [[NSMutableAttributedString alloc] initWithString:text
+                                                                attributes:self.defaultAttributedStringAttributes]];
+    }
 }
 
 - (void) setLinkPressedBlock:(void (^)(NSTextCheckingResult * textCheckingResult))linkPressedBlock
@@ -157,7 +166,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
         {
             self.blocks = [NSMutableDictionary dictionary];
         }
-        
+
         self.blocks[CoreTextLabelBlockKeyLinkPressed] = [linkPressedBlock copy];
     }
 }
@@ -170,7 +179,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.font = [UIFont systemFontOfSize:self.defaultFontSize];
     }
-    
+
     return _font;
 }
 
@@ -180,7 +189,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.boldFont = [UIFont boldSystemFontOfSize:self.defaultFontSize];
     }
-    
+
     return _boldFont;
 }
 
@@ -190,7 +199,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.italicFont = [UIFont italicSystemFontOfSize:self.defaultFontSize];
     }
-    
+
     return _italicFont;
 }
 
@@ -200,7 +209,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.boldItalicFont = [UIFont italicSystemFontOfSize:self.defaultFontSize];
     }
-    
+
     return _boldItalicFont;
 }
 
@@ -210,7 +219,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.linkFont = [UIFont systemFontOfSize:self.defaultFontSize];
     }
-    
+
     return _linkFont;
 }
 
@@ -220,7 +229,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.textColor = [UIColor blackColor];
     }
-    
+
     return _textColor;
 }
 
@@ -230,7 +239,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.boldTextColor = self.textColor;
     }
-    
+
     return _boldTextColor;
 }
 
@@ -240,7 +249,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.italicTextColor = self.textColor;
     }
-    
+
     return _italicTextColor;
 }
 
@@ -251,7 +260,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.boldItalicTextColor = self.textColor;
     }
-    
+
     return _boldItalicTextColor;
 }
 
@@ -261,7 +270,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         self.linkTextColor = self.textColor;
     }
-    
+
     return _linkTextColor;
 }
 
@@ -270,7 +279,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     BOOL stringIsDifferent = (AF_VALID(self.string, NSMutableAttributedString) == YES &&
                               AF_VALID(self.framesetterString, NSMutableAttributedString) == YES &&
                               [self.string isEqualToAttributedString:self.framesetterString] == NO);
-    
+
     if (!_framesetter || stringIsDifferent == YES)
     {
         if (AF_VALID(self.string, NSMutableAttributedString))
@@ -288,7 +297,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             }
         }
     }
-    
+
     return _framesetter;
 }
 
@@ -301,7 +310,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 {
     NSEnumerator *enumerator = [self.linkArray reverseObjectEnumerator];
     NSTextCheckingResult *result = nil;
-    
+
     while ((result = [enumerator nextObject]))
     {
         if (NSLocationInRange((NSUInteger)idx, result.range))
@@ -309,7 +318,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             return result;
         }
     }
-    
+
     return nil;
 }
 
@@ -331,7 +340,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     point = CGPointMake(point.x - textRect.origin.x, point.y - textRect.origin.y);
     // Convert tap coordinates (start at top left) to CT coordinates (start at bottom left)
     point = CGPointMake(point.x, textRect.size.height - point.y);
-    
+
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathAddRect(path, NULL, textRect);
     CTFrameRef frame = CTFramesetterCreateFrame(self.framesetter, CFRangeMake(0, self.string.length), path, NULL);
@@ -339,7 +348,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
         CFRelease(path);
         return NSNotFound;
     }
-    
+
     CFArrayRef lines = CTFrameGetLines(frame);
     NSInteger numberOfLines = self.numberOfLines > 0 ? MIN(self.numberOfLines, CFArrayGetCount(lines)) : CFArrayGetCount(lines);
     if (numberOfLines == 0) {
@@ -347,29 +356,29 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
         CFRelease(path);
         return NSNotFound;
     }
-    
+
     NSUInteger idx = NSNotFound;
-    
+
     CGPoint lineOrigins[numberOfLines];
     CTFrameGetLineOrigins(frame, CFRangeMake(0, numberOfLines), lineOrigins);
-    
+
     for (CFIndex lineIndex = 0; lineIndex < numberOfLines; lineIndex++)
     {
         CGPoint lineOrigin = lineOrigins[lineIndex];
         CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
-        
+
         // Get bounding information of line
         CGFloat ascent = 0.0f, descent = 0.0f, leading = 0.0f;
         CGFloat width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
         CGFloat yMin = floor(lineOrigin.y - descent);
         CGFloat yMax = ceil(lineOrigin.y + ascent);
-        
+
         // Check if we've already passed the line
         if (point.y > yMax)
         {
             break;
         }
-        
+
         // Check if the point is within this line vertically
         if (point.y >= yMin)
         {
@@ -383,10 +392,10 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             }
         }
     }
-    
+
     CFRelease(frame);
     CFRelease(path);
-    
+
     return idx;
 }
 
@@ -402,7 +411,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 - (CGSize) sizeThatFits:(CGSize)size
 {
     CGSize calcSize = CGSizeZero;
-    
+
     if (AF_VALID_NOTEMPTY(self.string, NSMutableAttributedString) == NO || self.string.length == 0 || CGSizeEqualToSize(size, CGSizeZero) || !self.framesetter)
     {
         return calcSize;
@@ -414,17 +423,18 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
     CGPathAddRect(framePath, nil, bounds);
     CTFrameRef aFrame = CTFramesetterCreateFrame(self.framesetter, fullStringRange, framePath, NULL);
-    
+
     CFRelease(framePath);
-    
-    if (!aFrame)
+
+    if (!aFrame || aFrame == NULL)
     {
         return calcSize;
     }
-    
+
     CFArrayRef lines = CTFrameGetLines(aFrame);
+    CFRetain(lines);
     CFIndex    count = CFArrayGetCount(lines);
-    
+
     _textIsTruncated = NO;
     // Limit lines if self.numberOfLines != 0
     if (self.numberOfLines != 0 && count > self.numberOfLines)
@@ -432,88 +442,105 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
         _textIsTruncated = YES;
         count = self.numberOfLines;
     }
-    
+
     CGPoint origins[count];
     CTFrameGetLineOrigins(aFrame, CFRangeMake(0, count), origins);
-    
+
+    if (aFrame)
+    {
+        CFRelease(aFrame);
+    }
+
     CGFloat calcHeight = 0.f;
     CGFloat calcWidth  = 0.f;
-    
+
     if (count > 0)
     {
         for (int lineIndex=0; lineIndex<count; lineIndex++)
         {
             CGFloat ascent, descent, leading, width;
-            
+
             CTLineRef line = (CTLineRef) CFArrayGetValueAtIndex(lines, lineIndex);
             width          = CTLineGetTypographicBounds(line, &ascent,  &descent, &leading);
             calcHeight     = ceilf(bounds.size.height - origins[lineIndex].y + descent);
-            
+
             if (width > calcWidth)
             {
                 calcWidth = width;
             }
         }
     }
-    
+
+    if (lines)
+    {
+        CFRelease(lines);
+    }
+
     calcSize.width  = (calcWidth <= size.width)   ? calcWidth  : size.width;
     calcSize.height = (calcHeight <= size.height) ? calcHeight : size.height;
-    
-    CFRelease(aFrame);
-    
+
     return calcSize;
 }
 
 - (void) drawRect:(CGRect)rect
 {
     [super drawRect:rect];
-    
+
     if (self.string == nil || [self.string isKindOfClass:[NSMutableAttributedString class]] == NO || self.string.length == 0)
     {
         return;
     }
-    
+
     // Fetch the context
-	CGContextRef context = UIGraphicsGetCurrentContext();
-    
-	// Flip the coordinate system
-	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-	CGContextTranslateCTM(context, 0, self.bounds.size.height);
-	CGContextScaleCTM(context, 1.0, -1.0);
-    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    // Flip the coordinate system
+    CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+    CGContextTranslateCTM(context, 0, self.bounds.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+
     CFRange fullStringRange = CFRangeMake(0, self.string.length);
-    
+
     CGMutablePathRef framePath = CGPathCreateMutable();
     CGPathAddRect(framePath, nil, rect);
     CTFrameRef aFrame = CTFramesetterCreateFrame(self.framesetter, fullStringRange, framePath, NULL);
-    
+
     if (!aFrame)
     {
         CFRelease(framePath);
         return;
     }
-    
+
     // Draw columns
     CFArrayRef columnPaths = [self columnPaths];
-    CFIndex    pathCount   = CFArrayGetCount(columnPaths);
-    
+    if (!columnPaths)
+    {
+        if (aFrame)
+        {
+            CFRelease(aFrame);
+        }
+        CFRelease(framePath);
+        return;
+    }
+
+    CFIndex pathCount  = CFArrayGetCount(columnPaths);
     CFIndex startIndex = 0;
-    
+
     int column;
     for (column = 0; column < pathCount; column++)
     {
         CGRect columnFrame = CGRectFromString([[self columnFrames] objectAtIndex:column]);
         CGPathRef path = (CGPathRef)CFArrayGetValueAtIndex(columnPaths, column);
-        
+
         // Create a frame for this column and draw it.
         CTFrameRef frame = CTFramesetterCreateFrame(self.framesetter, CFRangeMake(startIndex, 0), path, NULL);
-        
+
         CFArrayRef lines = CTFrameGetLines(frame);
         CFIndex    count = CFArrayGetCount(lines);
-        
+
         CGPoint origins[count];
         CTFrameGetLineOrigins(frame, CFRangeMake(0, count), origins); // Fill origins[] buffer.
-        
+
         // Draw every line but the last one (in last column)
         NSUInteger total = (column == pathCount-1) ? count-1 : count;
         for (CFIndex i = 0; i < total; i++)
@@ -523,34 +550,34 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
             CTLineDraw(line, context);
         }
-        
+
         // Draw last (truncated) line for last column
         if (column == pathCount-1 && total < count)
         {
             // Truncate the last line before drawing it
             CGPoint lastOrigin = origins[count-1];
             CTLineRef lastLine = CFArrayGetValueAtIndex(lines, count-1);
-            
+
             // Truncation token is a CTLineRef itself
             NSRange effectiveRange = NSMakeRange(0, 0);
             CFAttributedStringRef truncationString = CFAttributedStringCreate(NULL, CFSTR("\u2026"), (__bridge CFDictionaryRef)([self.string attributesAtIndex:0 effectiveRange:&effectiveRange]));
             CTLineRef truncationToken = CTLineCreateWithAttributedString(truncationString);
             CFRelease(truncationString);
-            
+
             // Range to cover everything from the start of lastLine to the end of the string
             CFRange rng = CFRangeMake(CTLineGetStringRange(lastLine).location, 0);
             rng.length = CFAttributedStringGetLength((__bridge CFAttributedStringRef)self.string) - rng.location;
-            
+
             // Substring with that range
             NSAttributedString * longString = [self.string attributedSubstringFromRange:NSMakeRange(rng.location, rng.length)];
-            
+
             // Line for that string
             CTLineRef longLine = CTLineCreateWithAttributedString((__bridge CFAttributedStringRef)longString);
-            
+
             CTLineRef truncated = CTLineCreateTruncatedLine(longLine, columnFrame.size.width, kCTLineTruncationEnd, truncationToken);
             CFRelease(longLine);
             CFRelease(truncationToken);
-            
+
             // If 'truncated' is NULL, then no truncation was required to fit it
             if (truncated == NULL && lastLine)
             {
@@ -564,16 +591,16 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
                 CTLineDraw(truncated, context);
                 CFRelease(truncated);
             }
-            
+
             _textIsTruncated = YES;
         }
-        
+
         // Start the next frame at the first character not visible in this frame.
         CFRange frameRange = CTFrameGetVisibleStringRange(frame);
         startIndex += frameRange.length;
         CFRelease(frame);
     }
-    
+
     CFRelease(framePath);
     CFRelease(columnPaths);
     CFRelease(aFrame);
@@ -581,18 +608,20 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (CFArrayRef) columnPaths
 {
+    CFMutableArrayRef   array = nil;
     NSArray           * frames = [self columnFrames];
-    CFMutableArrayRef   array = CFArrayCreateMutable(kCFAllocatorDefault, frames.count, &kCFTypeArrayCallBacks);
-    int                 column;
-    
-    for (column = 0; column < frames.count; column++)
+    if (AF_VALID_NOTEMPTY(frames, NSArray))
     {
-        CGMutablePathRef path = CGPathCreateMutable();
-        CGPathAddRect(path, NULL, CGRectFromString([frames objectAtIndex:column]));
-        CFArrayInsertValueAtIndex(array, column, path);
-        CFRelease(path);
+        array = CFArrayCreateMutable(kCFAllocatorDefault, frames.count, &kCFTypeArrayCallBacks);
+        for (int column = 0; column < frames.count; column++)
+        {
+            CGMutablePathRef path = CGPathCreateMutable();
+            CGPathAddRect(path, NULL, CGRectFromString([frames objectAtIndex:column]));
+            CFArrayInsertValueAtIndex(array, column, path);
+            CFRelease(path);
+        }
     }
-    
+
     return array;
 }
 
@@ -601,19 +630,19 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     CGRect     bounds          = self.bounds;
     NSUInteger numberOfColumns = MAX(self.numberOfColumns, 1);
     NSUInteger column;
-    
+
     CGRect columnRects[numberOfColumns];
-    
+
     // Start by setting the first column to cover the entire view.
     columnRects[0] = bounds;
-    
+
     // Divide the columns equally across the frame's width.
     CGFloat columnWidth = CGRectGetWidth(bounds) / numberOfColumns;
     for (column = 0; column < numberOfColumns - 1; column++)
     {
         CGRectDivide(columnRects[column], &columnRects[column],&columnRects[column + 1], columnWidth, CGRectMinXEdge);
     }
-    
+
     // Add column margin
     if (numberOfColumns > 1)
     {
@@ -622,14 +651,14 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             columnRects[column] = CGRectInset(columnRects[column], _columnMargin, 0.f);
         }
     }
-    
+
     // Create an array of layout paths, one for each column.
     NSMutableArray * array = [NSMutableArray new];
     for (column = 0; column < numberOfColumns; column++)
     {
         [array addObject:NSStringFromCGRect(columnRects[column])];
     }
-    
+
     return array;
 }
 
@@ -640,7 +669,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     CGPoint point   = [[touches anyObject] locationInView:self];
     CFIndex idx     = [self characterIndexAtPoint:point];
     self.activeLink = [self linkAtCharacterIndex:idx];
-    
+
     if (!self.activeLink)
     {
         [super touchesBegan:touches withEvent:event];
@@ -653,7 +682,7 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     {
         CGPoint point   = [[touches anyObject] locationInView:self];
         CFIndex idx     = [self characterIndexAtPoint:point];
-        
+
         if ([self.activeLink isEqual:[self linkAtCharacterIndex:idx]] == NO)
         {
             self.activeLink = nil;
@@ -712,16 +741,16 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 
 - (NSMutableDictionary *) defaultAttributedStringAttributes
 {
-	CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
+    CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
     CGColorRef parentColor = self.textColor.CGColor;
-    
+
     if (_lineSpacing < 0.f)
     {
         _lineSpacing = 0.f;
     }
-    
+
     CTTextAlignment textAlignment = CTTextAlignmentFromNSTextAlignment(_textAlignment);
-    
+
     CTParagraphStyleSetting setting[2] =
     {
         {
@@ -735,18 +764,18 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             &textAlignment
         }
     };
-    
+
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(setting, 2);
-    
+
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         (__bridge id)parentFont,  (id)kCTFontAttributeName,
                                         (__bridge id)parentColor, (id)kCTForegroundColorAttributeName,
                                         (__bridge id)paragraphStyle, (id)kCTParagraphStyleAttributeName,
                                         nil];
-    
+
     CFRelease(paragraphStyle);
     CFRelease(parentFont);
-    
+
     return attributes;
 }
 
@@ -758,16 +787,16 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
 - (NSMutableAttributedString *) attributedStringByHTML:(NSString *)html parentTag:(NSString *)parentTag
 {
     NSString * urlString   = nil;
-	CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
+    CTFontRef  parentFont  = CTFontCreateFromUIFont(self.font);
     CGColorRef parentColor = self.textColor.CGColor;
-    
+
     if (_lineSpacing < 0.f)
     {
         _lineSpacing = 0.f;
     }
-    
+
     CTTextAlignment textAlignment = CTTextAlignmentFromNSTextAlignment(_textAlignment);
-    
+
     CTParagraphStyleSetting setting[2] =
     {
         {
@@ -781,38 +810,38 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
             &textAlignment
         }
     };
-    
+
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(setting, 2);
-    
+
     NSMutableDictionary * attributes = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         (__bridge id)parentFont,  (id)kCTFontAttributeName,
                                         (__bridge id)parentColor, (id)kCTForegroundColorAttributeName,
                                         (__bridge id)paragraphStyle, (id)kCTParagraphStyleAttributeName,
                                         nil];
-    
+
     CFRelease(paragraphStyle);
-    
-	if (html == nil || [html isKindOfClass:[NSString class]] == NO)
-	{
+
+    if (html == nil || [html isKindOfClass:[NSString class]] == NO)
+    {
         CFRelease(parentFont);
-		return [[NSMutableAttributedString alloc] initWithString:@""
+        return [[NSMutableAttributedString alloc] initWithString:@""
                                                       attributes:attributes];
-	}
-    
+    }
+
     // Fix newlines
-	NSString * newLinePlaceHolder       = @"{BR}";
-	NSString * doubleNewLinePlaceHolder = [NSString stringWithFormat:@"%@%@", newLinePlaceHolder, newLinePlaceHolder];
-    
+    NSString * newLinePlaceHolder       = @"{BR}";
+    NSString * doubleNewLinePlaceHolder = [NSString stringWithFormat:@"%@%@", newLinePlaceHolder, newLinePlaceHolder];
+
     // Replace newlines and global starting or ending p- and div-tags with empty string
     html = [html stringByReplacingOccurrencesOfRegex:@"[\\s]+"
                                           withString:@" "];
 
-	html = [html stringByReplacingOccurrencesOfRegex:@"^<(p|div)[^>]*>"
+    html = [html stringByReplacingOccurrencesOfRegex:@"^<(p|div)[^>]*>"
                                           withString:@""];
 
-	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>$"
+    html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>$"
                                           withString:@""];
-    
+
     // Replace tags with newline placeholder
     html = [html stringByReplacingOccurrencesOfRegex:@"(</(p|div)>)([\\s]*)(<(p|div)[^>]*>)"
                                           withString:doubleNewLinePlaceHolder];
@@ -820,160 +849,160 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
     html = [html stringByReplacingOccurrencesOfRegex:@"<(p|div)[^>]*>"
                                           withString:doubleNewLinePlaceHolder];
 
-	html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>"
+    html = [html stringByReplacingOccurrencesOfRegex:@"</(p|div)>"
                                           withString:doubleNewLinePlaceHolder];
 
-	html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>"
+    html = [html stringByReplacingOccurrencesOfRegex:@"<br[^>]*>"
                                           withString:newLinePlaceHolder];
-    
+
     // Remove other unsupported tags
     html = [html stringByReplacingOccurrencesOfRegex:@"</?(?!a|b|i|em|strong)\\w+[^>]*>"
                                           withString:@""];
 
     // Remove spaces at line beginning after newline (that's how HTML would render it)
     html = [html stringByReplacingOccurrencesOfRegex:@"\\{BR\\}\\s*" withString:newLinePlaceHolder];
-    
-	NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
+
+    NSMutableAttributedString * attrString = [[NSMutableAttributedString alloc] initWithString:html
                                                                                     attributes:attributes];
-    
+
     NSRange newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
-    
+
     CTFontRef attrFont = CTFontCreateFromUIFont(self.font);
-    
+
     [attributes setValue:(__bridge id)(attrFont)
                   forKey:(id)kCTFontAttributeName];
-    
-    CFRelease(attrFont);
-    
-	do
-	{
-		if (newLinePlaceholder.location != NSNotFound)
-		{
-			NSAttributedString * newLine = [[NSAttributedString alloc] initWithString:@"\n" attributes:attributes];
-            
-			[attrString replaceCharactersInRange:newLinePlaceholder withAttributedString:newLine];
-		}
-		newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
-        
-	}
-	while (newLinePlaceholder.location != NSNotFound);
 
-	if (parentTag)
-	{
-		if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
-		{
+    CFRelease(attrFont);
+
+    do
+    {
+        if (newLinePlaceholder.location != NSNotFound)
+        {
+            NSAttributedString * newLine = [[NSAttributedString alloc] initWithString:@"\n" attributes:attributes];
+
+            [attrString replaceCharactersInRange:newLinePlaceholder withAttributedString:newLine];
+        }
+        newLinePlaceholder = [attrString.string rangeOfString:newLinePlaceHolder];
+
+    }
+    while (newLinePlaceholder.location != NSNotFound);
+
+    if (parentTag)
+    {
+        if ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"])
+        {
             CFRelease(parentFont);
-			parentFont  = CTFontCreateFromUIFont(self.boldFont);
+            parentFont  = CTFontCreateFromUIFont(self.boldFont);
             parentColor = self.boldTextColor.CGColor;
-		}
-		if ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"])
-		{
+        }
+        if ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"])
+        {
             CFRelease(parentFont);
-			parentFont  = CTFontCreateFromUIFont(self.italicFont);
+            parentFont  = CTFontCreateFromUIFont(self.italicFont);
             parentColor = self.italicTextColor.CGColor;
-		}
-		if ([parentTag isEqualToString:@"a"])
-		{
+        }
+        if ([parentTag isEqualToString:@"a"])
+        {
             CFRelease(parentFont);
-			parentFont  = CTFontCreateFromUIFont(self.linkFont);
+            parentFont  = CTFontCreateFromUIFont(self.linkFont);
             parentColor = self.linkTextColor.CGColor;
-		}
-	}
-    
-	NSRange tagRange = [attrString.string rangeOfRegex:@"(<)([^>]+)(/>|>)"];
-    
-	do
-	{
-		if (tagRange.location != NSNotFound)
-		{
-			// Prepare tag
-			NSString * searchTag = [attrString.string substringWithRange:tagRange];
-			searchTag            = [searchTag stringByReplacingOccurrencesOfString:@"<" withString:@""];
-			searchTag            = [searchTag stringByReplacingOccurrencesOfString:@">" withString:@""];
-            
-			// Remove attributes from tag
-			if ([searchTag rangeOfRegex:@" "].location != NSNotFound)
-			{
+        }
+    }
+
+    NSRange tagRange = [attrString.string rangeOfRegex:@"(<)([^>]+)(/>|>)"];
+
+    do
+    {
+        if (tagRange.location != NSNotFound)
+        {
+            // Prepare tag
+            NSString * searchTag = [attrString.string substringWithRange:tagRange];
+            searchTag            = [searchTag stringByReplacingOccurrencesOfString:@"<" withString:@""];
+            searchTag            = [searchTag stringByReplacingOccurrencesOfString:@">" withString:@""];
+
+            // Remove attributes from tag
+            if ([searchTag rangeOfRegex:@" "].location != NSNotFound)
+            {
                 if ([searchTag rangeOfString:@"href="].location != NSNotFound)
                 {
                     urlString = [searchTag stringByReplacingOccurrencesOfRegex:@"(.*)(href=\\\")(.+?)(\\\")(.*)"
                                                                     withString:@"$3"];
                 }
-                
-				NSInteger location = [searchTag rangeOfRegex:@" "].location;
-				searchTag          = [searchTag stringByReplacingCharactersInRange:NSMakeRange(location, [searchTag length]-location) withString:@""];
-			}
-            
-			NSString * regString = [NSString stringWithFormat:@"<%@[^>]*>(.*?)</%@>", searchTag, searchTag];
-			NSRange    match     = [attrString.string rangeOfRegex:regString
+
+                NSInteger location = [searchTag rangeOfRegex:@" "].location;
+                searchTag          = [searchTag stringByReplacingCharactersInRange:NSMakeRange(location, [searchTag length]-location) withString:@""];
+            }
+
+            NSString * regString = [NSString stringWithFormat:@"<%@[^>]*>(.*?)</%@>", searchTag, searchTag];
+            NSRange    match     = [attrString.string rangeOfRegex:regString
                                                            options:RKLDotAll|RKLMultiline
                                                            inRange:NSMakeRange(0, attrString.string.length)
                                                            capture:0
                                                              error:nil];
-            
-			if (match.location != NSNotFound)
-			{
-				NSString * innerString = [attrString.string substringWithRange:match];
 
-				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag]
+            if (match.location != NSNotFound)
+            {
+                NSString * innerString = [attrString.string substringWithRange:match];
+
+                innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"<%@[^>]*>", searchTag]
                                                                                withString:@""];
 
-				innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag]
+                innerString            = [innerString stringByReplacingOccurrencesOfRegex:[NSString stringWithFormat:@"</%@>", searchTag]
                                                                                withString:@""];
-                
-				CTFontRef  matchFont  = parentFont;
+
+                CTFontRef  matchFont  = parentFont;
                 CGColorRef matchColor = parentColor;
                 CFRetain(matchFont);
-                
-				if ([searchTag isEqualToString:@"b"] || [searchTag isEqualToString:@"strong"])
-				{
+
+                if ([searchTag isEqualToString:@"b"] || [searchTag isEqualToString:@"strong"])
+                {
                     CFRelease(matchFont);
-					matchFont  = CTFontCreateFromUIFont(self.boldFont);
+                    matchFont  = CTFontCreateFromUIFont(self.boldFont);
                     matchColor = self.boldTextColor.CGColor;
-                    
-					if (parentTag && ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"]))
-					{
+
+                    if (parentTag && ([parentTag isEqualToString:@"i"] || [parentTag isEqualToString:@"em"]))
+                    {
                         CFRelease(matchFont);
-						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
+                        matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
                         matchColor = self.boldItalicTextColor.CGColor;
-					}
-				}
-				if ([searchTag isEqualToString:@"i"] || [searchTag isEqualToString:@"em"])
-				{
+                    }
+                }
+                if ([searchTag isEqualToString:@"i"] || [searchTag isEqualToString:@"em"])
+                {
                     CFRelease(matchFont);
-					matchFont  = CTFontCreateFromUIFont(self.italicFont);
+                    matchFont  = CTFontCreateFromUIFont(self.italicFont);
                     matchColor = self.italicTextColor.CGColor;
-                    
-					if (parentTag && ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"]))
-					{
+
+                    if (parentTag && ([parentTag isEqualToString:@"b"] || [parentTag isEqualToString:@"strong"]))
+                    {
                         CFRelease(matchFont);
-						matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
+                        matchFont  = CTFontCreateFromUIFont(self.boldItalicFont);
                         matchColor = self.boldItalicTextColor.CGColor;
-					}
-				}
-                
+                    }
+                }
+
                 [attributes setValue:(__bridge id)matchFont
                               forKey:(id)kCTFontAttributeName];
-                
+
                 [attributes setValue:(__bridge id)matchColor
                               forKey:(id)kCTForegroundColorAttributeName];
-                
-				NSMutableAttributedString * innerAttrString = [[NSMutableAttributedString alloc] initWithString:innerString attributes:attributes];
-                
-				NSRange innerMatch = [innerAttrString.string rangeOfRegex:@"<[^/>]+>(.*?)</[^>]+>"];
-				if (innerMatch.location != NSNotFound)
-				{
-					NSString * nestedInnerString = [innerAttrString.string substringWithRange:innerMatch];
-                    
-					NSAttributedString * nestedAttrString = [self attributedStringByHTML:nestedInnerString
+
+                NSMutableAttributedString * innerAttrString = [[NSMutableAttributedString alloc] initWithString:innerString attributes:attributes];
+
+                NSRange innerMatch = [innerAttrString.string rangeOfRegex:@"<[^/>]+>(.*?)</[^>]+>"];
+                if (innerMatch.location != NSNotFound)
+                {
+                    NSString * nestedInnerString = [innerAttrString.string substringWithRange:innerMatch];
+
+                    NSAttributedString * nestedAttrString = [self attributedStringByHTML:nestedInnerString
                                                                                parentTag:searchTag];
-                    
-					[innerAttrString replaceCharactersInRange:innerMatch withAttributedString:nestedAttrString];
-				}
-                
-				[attrString replaceCharactersInRange:match
+
+                    [innerAttrString replaceCharactersInRange:innerMatch withAttributedString:nestedAttrString];
+                }
+
+                [attrString replaceCharactersInRange:match
                                 withAttributedString:innerAttrString];
-                
+
                 if (AF_VALID_NOTEMPTY(urlString, NSString))
                 {
                     [self addLink:[NSURL URLWithString:urlString]
@@ -981,26 +1010,26 @@ NSString * CoreTextLabelBlockKeyLinkPressed = @"CoreTextLabelBlockKeyLinkPressed
                          inString:attrString];
                     urlString = nil;
                 }
-                
-                
+
+
                 CFRelease(matchFont);
-			}
-			else
+            }
+            else
             {
-				NSLog(@"NOT found: regString:%@ match(%li,%li) %@", regString, (unsigned long)match.location, (unsigned long)match.length, attrString.string);
+                NSLog(@"NOT found: regString:%@ match(%li,%li) %@", regString, (unsigned long)match.location, (unsigned long)match.length, attrString.string);
                 tagRange = NSMakeRange(NSNotFound, 0);
                 continue;
-			}
-            
-			tagRange = [attrString.string rangeOfRegex:@"<[^>]+>"];
-		}
-        
-	}
-	while (tagRange.location != NSNotFound);
+            }
+
+            tagRange = [attrString.string rangeOfRegex:@"<[^>]+>"];
+        }
+
+    }
+    while (tagRange.location != NSNotFound);
     
     CFRelease(parentFont);
     
-	return attrString;
+    return attrString;
 }
 
 CTFontRef CTFontCreateFromUIFont(UIFont * font)
